@@ -187,8 +187,13 @@ Currentlly, when rendering ocean it looks too smooth \ref{fig:ocean_no_choppy} a
 
 To make waves choppy we need to introduce horizotal displacement. This will not only make waves more chopy but also make energy transfer between waves more relistic. Following formula from \cite[J. Tessendorf]{tessendorf2004} we can calculate horizontal displacement:
 \begin{equation}
-    D_{\text{hori}}(\textbf{x}, t) = -i\frac{\mathbf{k}}{k}\tilde{h(\mathbf{k}, t)}
+    \mathbf{D}_{\text{hori}}(\textbf{x}, t) = -i\frac{\mathbf{k}}{k}\tilde{h(\mathbf{k}, t)}
 \end{equation}
+Using this horizotal displacement we can displace our verticies:
+\begin{equation}
+    \mathbf{x} + \lambda \mathbf{D}_{\text{hori}}(\textbf{x}, t)
+\end{equation}
+, where $\lambda$ is "choppy factor".
 Once again we need to perform IFFT \ref{fig:ifft_algorithm} to get horizontal displacement in the time domain.
 
 \begin{minipage}{1\textwidth}
@@ -198,7 +203,7 @@ Once again we need to perform IFFT \ref{fig:ifft_algorithm} to get horizontal di
     \label{fig:ocean_choppy}
 \end{minipage}
 
-\section{Ocean Shading}
+%\section{Ocean Shading}
 
 % \begin{table}[H]
 %     \centering
@@ -239,7 +244,7 @@ Once again we need to perform IFFT \ref{fig:ifft_algorithm} to get horizontal di
 %     \label{table:lighting_parameters}
 % \end{table}
 
-\subsection{Lighting}
+%\subsection{Lighting}
 
 % \subsubsection{Ambient Light}
 % Ambient light is light that does not come from any specific light source, but rather result of light being scattered in the environment. It is constant and does not depend on the direction of the light source.
@@ -275,11 +280,56 @@ Once again we need to perform IFFT \ref{fig:ifft_algorithm} to get horizontal di
 
 % \subsubsection{Output}
 
-\subsection{Foam}
-Ocean foam is one of the most features about ocean. It makes the ocean more defined and relistic.
-The main place where foam occures is wave crashes. Horizotanl displacement allows these wave crashes, and we can observe these wave crashes when we have set 
-To render foam \cite[J. Tessendorf]{tessendorf2001} suggests to calculate the determinant of jacobian matrix for horizontal displacement.
-In our ocean simulation jacobian matrix tells us how much change there is over x and z axis.
+\section{Foam}
+
+\subsection{Foam Generation}
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.50\textwidth]{"images/wave_curl.png"}
+    \captionof{figure}{Wave Curl At Wave Peek}
+    \label{fig:wave_curl}
+\end{minipage}
+
+Ocean foam is a salient and realistic feature of the ocean, contributing to its distinct and authentic appearance. The primary occurrence of foam is observed during wave crashes, a phenomenon facilitated by horizontal displacement. This can be visually discerned at the peaks of waves where the water curls up, as illustrated in Figure \ref{fig:wave_curl}. In essence, our horizontal transformation undergoes an inversion.
+
+As proposed by Tessendorf \cite{tessendorf2001}, the rendering of foam can be achieved by calculating the determinant of the Jacobian matrix for horizontal displacement, which helps identify these inversions. In our ocean simulation, the Jacobian matrix provides insights into the changes over the x and z axes. When determinant of the Jacobian matrix is bellow zero the "wave crash" happens:
+
+\begin{equation}
+    \text{Det}(\mathbf{x}) = J_{xx} + J_{yy} - J_{xy} J_{yx}
+\end{equation}
+where,
+\begin{equation}
+    J(\mathbf{x}) = 
+    \begin{bmatrix} 
+        1 + \lambda\frac{\partial D_x(\mathbf{x})}{\partial x} & 1 + \lambda\frac{\partial D_x(\mathbf{x})}{\partial y} \\
+        1 + \lambda\frac{\partial D_y(\mathbf{x})}{\partial x} & 1 + \lambda\frac{\partial D_y(\mathbf{x})}{\partial y} 
+    \end{bmatrix} 
+\end{equation}
+in this case $J_{xy} = J_{yx}$.
+
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.40\textwidth]{"images/foam_texture.png"}
+    \captionof{figure}{Foam Texture}
+    \label{fig:foam_texture}
+\end{minipage}
+
+\subsection{Foam Accumilation}
+Curretlly the foam apears and diasapears quicly, however in real life the foam accumilates and disapears over time.
+We can introduce foam accumilation by compering previous and current foam values:
+\begin{lstlisting}[caption={Foam Accumilation}, frame=single, numberstyle=\small\color{gray}, captionpos=b]
+    float accumulation = 
+    LastFoamValue - FoamDecay * DeltaTime / max(currentFoam, 0.5);
+    float foam = max(accumulation, currentFoam);
+\end{lstlisting}
+This results in pleasing foam accumilation:
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=1.0\textwidth]{"images/ocean_with_foam.png"}
+    \captionof{figure}{Ocean With Foam}
+    \label{fig:ocean_with_foam}
+\end{minipage}
+
 
 % Before we start, all callculations were taken inside GPU, using HLSL language. This allows us to use parallelism and speed up the process dramatically.
 % As FFT requires our sample data length be power of 2, we will use $n \cdot n = 512 \text{x} 512$ textures to represent our data.
