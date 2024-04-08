@@ -325,11 +325,42 @@ We can introduce foam accumilation by compering previous and current foam values
 This results in pleasing foam accumilation:
 \begin{minipage}{1\textwidth}
     \centering
-    \includegraphics[width=1.0\textwidth]{"images/ocean_with_foam.png"}
+    \includegraphics[width=0.8\textwidth]{"images/ocean_with_foam.png"}
     \captionof{figure}{Ocean With Foam}
     \label{fig:ocean_with_foam}
 \end{minipage}
 
+\section{Multiple Cascades}
+At this stage our ocean with texture 512x512 simulates 262,144 distinc waves however the tilling is still noticible \ref{fig:ocean_with_tilling}.
+
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{"images/tilling_ocean.png"}
+    \captionof{figure}{Ocean with Tilling}
+    \label{fig:ocean_with_tilling}
+\end{minipage}
+
+To counter this we could increase our simulation texture however even FFT becomes expensive really fast.
+Another approuch is to simulate multiple cascades for diffrent wave lengths $k$ \ref{fig:cascades}. We can split our simulation into 3 parts, big waves, medium waves and small waves.
+
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{"images/cascades.png"}
+    \captionof{figure}{Cascades}
+    \label{fig:cascades}
+\end{minipage}
+
+This results ocean that has less tilling and more detail \ref{fig:ocean_with_cascades}.
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{"images/ocean_with_cascades.png"}
+    \captionof{figure}{Ocean with Cascades}
+    \label{fig:ocean_with_cascades}
+\end{minipage}
+
+\section{Performance}
+
+\section{Compereson}
 
 % Before we start, all callculations were taken inside GPU, using HLSL language. This allows us to use parallelism and speed up the process dramatically.
 % As FFT requires our sample data length be power of 2, we will use $n \cdot n = 512 \text{x} 512$ textures to represent our data.
