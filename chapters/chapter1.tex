@@ -36,49 +36,10 @@ we are using real-world data to generate frequencies.
 
 \begin{minipage}{1\textwidth}
     \centering
-    \includegraphics[width=0.75\textwidth]{"images/final_ocean_simulation.png"}
+    \includegraphics[width=0.8\textwidth]{"images/final_ocean_simulation.png"}
     \captionof{figure}{FFT Ocean Simulation}
     \label{fig:ocean_simulation}
 \end{minipage}
-
-\section{Gerstner Waves}
-Gerstner waves provide a simple model for generating somewhat realistic ocean waves. This model is straightforward to implement and is predominantly used in video games. Even major titles, such as “Pokemon Legends: Arceus”, utilize something similar to Gerstner waves to simulate oceanic environments.
-The concept of Gerstner waves was first introduced by F.J. Gerstner \cite{Franz1809} in 1802. The initial known implementation of Gerstner waves in computer graphics was carried out by Fournier and Reeves \cite{AlainWilliam1986} in 1986. The model is an attempt to approximate the motion of ocean waves, based on the principle that each point in the ocean undergoes a circular motion.
-If a point is represented as $\mathbf{x_0} = (x_0, z_0)$, the height and horizontal displacements can be calculated as follows:
-\begin{equation}
-\mathbf{x} = \mathbf{x_0} - (\mathbf{k} / k) A \sin(\mathbf{k} \cdot \mathbf{x_0} - \omega t)
-\end{equation}
-\begin{equation}
-    y = A \cos(\mathbf{k} \cdot \mathbf{x_0} - \omega t)
-\end{equation}
-\begin{equation}
-    \omega = \sqrt{gk}
-\end{equation}
-Here, $A$ is the amplitude, $\omega$ is dispertion relationship, and $\mathbf{k}$ is a wave vector that points horizontally in the direction of wave travel and is proportional to the wavelength $\lambda$ of the wave.
-\begin{equation}
-k = 2 \pi / \lambda
-\end{equation}
-As presented, the Gerstner waves model is limited to a single wave. To simulate more complex ocean surfaces, multiple waves need to be summed together. This is achieved by summing the waves as follows:
-\begin{equation}
-\mathbf{x} = \mathbf{x_0} - \sum_{i=1}^{N} (\mathbf{k_i} / k_i) A_i \sin(\mathbf{k_i} \cdot \mathbf{x_0} - \omega_i t)
-\end{equation}
-Here, $N$ is the number of waves, $A_i$ is the set of amplitudes, $\omega_i$ is the set of frequencies, and $\mathbf{k}_i$ is the set of wave vectors.
-The primary challenge with this approach is that simulating realistic ocean surfaces requires summing a large number of waves together, which can be computationally expensive. 
-Furthermore, Gerstner waves offer limited artistic control, has visible tiling \ref{fig:pokemon_water_tiling}, and underperforms in simulating stormy weather conditions.
-
-\begin{minipage}{1\textwidth}
-    \centering
-    \includegraphics[width=0.75\textwidth]{"images/pokemon_water_tiling.png"}
-    \captionof{figure}{Water Tiling in Pokemon Legends: Arceus}
-    \label{fig:pokemon_water_tiling}
-\end{minipage}
-
-\section{Particle Simulation and Machine Learning}
-Particle-based methods are commonly used for realistic water simulation, but they’re computationally expensive.
-Recent advancements in Graphics Processing Unit (GPU) technology, coupled with innovative research such as that conducted by Libo Huang \cite{huang2021}, are progressively rendering particle simulations more feasible for ocean simulation. Nonetheless, these techniques necessitate a high-performance GPU and are not yet suitable for widespread real-time applications.
-
-Furthermore, there have been significant strides in the application of machine learning to expedite fluid simulations, as evidenced by the work of Dmitrii Kochkov \cite{kochkov2021machine}. These methodologies, however, are exceedingly complex, necessitating expertise in both computer graphics and machine learning. Additionally, they require substantial volumes of data for model training.
-Therefore, they will not be considered for this project.
 
 \section{Fourier Transform}
 The Fourier Transform is a mathematical method that enables us to convert our data from the time domain to the frequency domain, and vice versa. To simplify, imagine we have a smoothie that’s too sour. With the Fourier Transform, we could deconstruct our smoothie (time domain) into its ingredients (frequency domain), remove the sour component, and then reconstruct it back.
@@ -104,7 +65,7 @@ and the Inverse Discrete Fourier Transform (IDFT):
 \end{equation}
 
 \section{Fourier Transform Ocean}
-The challenge with Gerstner waves is that we need to generate multiple waves for each vertex to simulate an ocean. This can be computationally expensive as an ocean can have thousands of vertices. To address this problem, J. Tessendorf\cite{tessendorf2001} proposed a method to generate ocean waves using the Fourier Transform.
+A significant challenge associated with the utilization of Gerstner waves, as will be elaborated upon in the related works section, is the necessity to generate multiple waves for each vertex in order to simulate an ocean. This process can be computationally intensive, particularly considering that an oceanic simulation may be constructed of thousands vertices. In response to this computational demand, J. Tessendorf \cite{tessendorf2001} proposed a method for generating ocean waves using the Fourier Transform.
 
 The main idea is to generate a height map of the ocean surface in the frequency domain, and then convert it back to the time domain using the IFT. Since the IFT produces a periodic height map, we can tile it to create an infinite ocean surface. This means that we can generate one texture and apply it to the entire water body.
 
@@ -275,7 +236,46 @@ The basic idea of the FFT algorithm is as follows:
     \end{minipage}
 \end{enumerate}
 
+\section{Related Work}
 
+\subsection{Gerstner Waves}
+Gerstner waves provide a simple model for generating somewhat realistic ocean waves. This model is straightforward to implement and is predominantly used in video games. Even major titles, such as “Pokemon Legends: Arceus”, utilize something similar to Gerstner waves to simulate oceanic environments.
+The concept of Gerstner waves was first introduced by F.J. Gerstner \cite{Franz1809} in 1802. The initial known implementation of Gerstner waves in computer graphics was carried out by Fournier and Reeves \cite{AlainWilliam1986} in 1986. The model is an attempt to approximate the motion of ocean waves, based on the principle that each point in the ocean undergoes a circular motion.
+If a point is represented as $\mathbf{x_0} = (x_0, z_0)$, the height and horizontal displacements can be calculated as follows:
+\begin{equation}
+\mathbf{x} = \mathbf{x_0} - (\mathbf{k} / k) A \sin(\mathbf{k} \cdot \mathbf{x_0} - \omega t)
+\end{equation}
+\begin{equation}
+    y = A \cos(\mathbf{k} \cdot \mathbf{x_0} - \omega t)
+\end{equation}
+\begin{equation}
+    \omega = \sqrt{gk}
+\end{equation}
+Here, $A$ is the amplitude, $\omega$ is dispertion relationship, and $\mathbf{k}$ is a wave vector that points horizontally in the direction of wave travel and is proportional to the wavelength $\lambda$ of the wave.
+\begin{equation}
+k = 2 \pi / \lambda
+\end{equation}
+As presented, the Gerstner waves model is limited to a single wave. To simulate more complex ocean surfaces, multiple waves need to be summed together. This is achieved by summing the waves as follows:
+\begin{equation}
+\mathbf{x} = \mathbf{x_0} - \sum_{i=1}^{N} (\mathbf{k_i} / k_i) A_i \sin(\mathbf{k_i} \cdot \mathbf{x_0} - \omega_i t)
+\end{equation}
+Here, $N$ is the number of waves, $A_i$ is the set of amplitudes, $\omega_i$ is the set of frequencies, and $\mathbf{k}_i$ is the set of wave vectors.
+The primary challenge with this approach is that simulating realistic ocean surfaces requires summing a large number of waves together, which can be computationally expensive. 
+Furthermore, Gerstner waves offer limited artistic control, has visible tiling \ref{fig:pokemon_water_tiling}, and underperforms in simulating stormy weather conditions.
+
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.75\textwidth]{"images/pokemon_water_tiling.png"}
+    \captionof{figure}{Water Tiling in Pokemon Legends: Arceus}
+    \label{fig:pokemon_water_tiling}
+\end{minipage}
+
+\subsection{Particle Simulation and Machine Learning}
+Particle-based methodologies are frequently employed for the simulation of water in a manner that is both realistic and visually compelling. However, these methods are associated with a high computational cost.
+
+Recent advancements in Graphics Processing Unit (GPU) technology, in conjunction with research such as that conducted by Libo Huang \cite{huang2021}, are incrementally making particle simulations more viable for ocean simulation. Despite this progress, these techniques demand a high-performance GPU and are not yet amenable to widespread real-time applications.
+
+Moreover, there have been considerable advancements in the application of machine learning to accelerate fluid simulations, as demonstrated by the work of Dmitrii Kochkov \cite{kochkov2021machine}. However, this is out of this projects scope and won't be disccused.
 
 
 % Introdunction on my project
