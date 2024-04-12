@@ -45,6 +45,18 @@ You can see clear diffrence between "Phillips" spectrum and TMA spectrum:
 
 \subsection{Real world oceans}
 When it comes to calm ocean, the FFT based ocean with TMA spectrum performs extremelly well and holds the desired shape as shown in figures \ref{fig:real_calm_ocean} and \ref{fig:fake_calm_ocean}.
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+        \hline
+        \textbf{Spectrum} & \textbf{Size} & $\mathbf{l_1}$ & $\mathbf{l_2}$ & $\mathbf{l_3}$ & $\mathbf{\lambda}$ & $\mathbf{U_{10}}$ & \textbf{Fetch} & \textbf{Depth} \\
+        \hline
+        256x256 & TMA & 256 & 128 & 70 & 0.9 & 1 m/s & 1000 km & 500 m \\
+        \hline
+    \end{tabular}
+    \caption{Calm Ocean Parameters}
+    \label{tab:calm_ocean}
+\end{table}
 
 \begin{minipage}{0.48\textwidth}
     \centering
@@ -53,6 +65,7 @@ When it comes to calm ocean, the FFT based ocean with TMA spectrum performs extr
     \captionof{figure}{Calm Atlantic Ocean\\ Credits: CC0 Public Domain}
     \label{fig:real_calm_ocean}
 \end{minipage}
+\hfill
 \begin{minipage}{0.48\textwidth}
     \centering
     \includegraphics[width=0.8\textwidth]{"images/fake_calm_ocean.png"}
@@ -62,6 +75,19 @@ When it comes to calm ocean, the FFT based ocean with TMA spectrum performs extr
 
 When it comes to stormy ocean where huge waves is expected the general shape of an ocean is still relistic
 and can hadle the big waves without any trouble, and because of diffrent cascades the tilling is bearlly noticible as shown in the following figures \ref{fig:real_stormy_ocean} and \ref{fig:fake_stormy_ocean}.
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+        \hline
+        \textbf{Spectrum} & \textbf{Size} & $\mathbf{l_1}$ & $\mathbf{l_2}$ & $\mathbf{l_3}$ & $\mathbf{\lambda}$ & $\mathbf{U_{10}}$ & \textbf{Fetch} & \textbf{Depth} \\
+        \hline
+        256x256 & TMA & 700 & 256 & 70 & 0.9 & 21 m/s & 1000 km & 500 m \\
+        \hline
+    \end{tabular}
+    \caption{Stormy Ocean Parameters}
+    \label{tab:stormy_ocean}
+\end{table}
+where each $l$ is the wave length scale of each cascade.
 
 \begin{minipage}{0.48\textwidth}
     \centering
@@ -70,6 +96,7 @@ and can hadle the big waves without any trouble, and because of diffrent cascade
     \captionof{figure}{Calm Atlantic Ocean\\ Credits: CC0 Public Domain}
     \label{fig:real_stormy_ocean}
 \end{minipage}
+\hfill
 \begin{minipage}{0.48\textwidth}
     \centering
     \includegraphics[width=0.8\textwidth]{"images/fake_stormy_ocean.png"}

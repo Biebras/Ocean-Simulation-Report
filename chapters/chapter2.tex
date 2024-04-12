@@ -120,21 +120,29 @@ This causes our data to flip sign in grid like pattern therefore we need to perm
 \section{Ocean Geometry}
 \subsection{Spectrum Generation}
 
-% % Table
-% \begin{table}
-%     \centering
-%     \begin{tabular}{|c|c|c|}
-%         \hline
-%         \textbf{Symbol} & \textbf{Parameter} & \textbf{Expression} \\
-%         \hline
-%         $\mathbf{k}$ & wave length &  \\
-%         \hline
-%         $\omega$ & dispertion relationship & x \\
-%         \hline
-%     \end{tabular}
-%     \caption{Deffinition Table}
-%     \label{table:deffinition_table}
-% \end{table}
+% Table
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        \textbf{Symbol} & \textbf{Meaning} \\
+        \hline
+        $S(\omega)$ & Non directional wave spectrum \\
+        $S(\omega, \theta)$ & Directional wave spectrum\\
+        $S(\mathbf{k})$ & Directional wave spectrum\\
+        $\mathbf{k}$ & wave vector \\
+        $k$ & Magnetude of wave vector\\
+        $l$ & Length scale of the ocean\\
+        $\omega$ & dispertion relationship (angular frequency)\\
+        $U_{10}$ & Wind speed at 10m above the sea level\\
+        $F$ & Fetch (Disntance from lee shore)\\
+        $\theta_{\text{wind}}$ & Wind angle\\
+        $\lambda$ & Choppy factor\\
+        \hline
+    \end{tabular}
+    \caption{Deffinition Table}
+    \label{table:deffinition_table}
+\end{table}
 
 Spectrums are responsable for whole look of the ocean. It's importatnt to pick the one that is based on real world data to make our ocean look realistic.
 Initialy, Tessendorf spectrum \ref{eq:tessendorf_spectrum} was implemented as it was straight forward to implement. However, it didn't produce satisfying results, as waves didn't seem to transfer energy in convincing way, waves didn't seem to follow wave direction and it was hard to have artistic control over the ocean.
