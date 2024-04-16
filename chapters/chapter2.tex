@@ -231,86 +231,142 @@ Once again we need to perform IFFT \ref{fig:ifft_algorithm} to get horizontal di
     \label{fig:ocean_choppy}
 \end{minipage}
 
-%\section{Ocean Shading}
+\section{Ocean Shading}
 
-% \begin{table}[H]
-%     \centering
-%     \begin{tabular}{|c|c|c|}
-%         \hline
-%         \textbf{Symbol} & \textbf{Parameter} \\
-%         \hline
-%         $L_A$ & Ambient Light \\
-%         \hline
-%         $N$ & Normal \\
-%         \hline
-%         $D_S$ & Sun Direction \\
-%         \hline
-%         $D_V$ & View Direction \\
-%         \hline
-%         $C_A$ & Ambient Light Color \\
-%         \hline
-%         $C_L$ & Light Color \\
-%         \hline
-%         $C_B$ & Air Bubble Color \\
-%         \hline
-%         $C_{WS}$ & Water Scattering Color \\
-%         \hline
-%         $H$ & Ocean Height \\
-%         \hline
-%         $F$ & Fresnel Effect \\
-%         \hline
-%         $\rho_a$ & Air Bubble Density \\
-%         \hline
-%         $k_A$ & Ambient Light Intensity \\
-%         \hline
-%         $k_{S_1}$ & Subsurface Scattering Intensity \\
-%         \hline
-%         $k_{S_2}$ & Subsurface Scattering Intensity \\
-%         \hline
-%     \end{tabular}
-%     \caption{Lighting Parameters}
-%     \label{table:lighting_parameters}
-% \end{table}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \textbf{Symbol} & \textbf{Parameter} \\
+        \hline
+        $L_a$ & Ambient Light \\
+        $L_ss$ & Subsurface Scatter Light\\
+        $L_s$ & Specular Light\\
+        $L_r$ & Enviroment Reflection\\
+        $N$ & Normal \\
+        $D_s$ & Sun Direction \\
+        $D_v$ & View Direction \\
+        $C_a$ & Ambient Light Color \\
+        $C_l$ & Light Color \\
+        $C_b$ & Air Bubble Color \\
+        $C_{ws}$ & Water Scattering Color \\
+        $H$ & Ocean Height \\
+        $F$ & Fresnel Effect \\
+        $\rho_a$ & Air Bubble Density \\
+        $k_a$ & Ambient Light Intensity \\
+        $k_{ss_1}$ & Subsurface Scattering Intensity \\
+        $k_{ss_2}$ & Subsurface Scattering Intensity \\
+        \hline
+    \end{tabular}
+    \caption{Lighting Parameters}
+    \label{table:lighting_parameters}
+\end{table}
 
-%\subsection{Lighting}
+\subsection{Lighting Model}
 
-% \subsubsection{Ambient Light}
-% Ambient light is light that does not come from any specific light source, but rather result of light being scattered in the environment. It is constant and does not depend on the direction of the light source.
-% For ocean we use  ambient light aproximation formula taken from GDC confference \cite{mark2021}:
-% \begin{equation}
-%     L_A = k_A N C_A C_L + \rho_a C_B C_L
-% \end{equation}
+\subsubsection{Output}
+For our lighting model we going to have 4 components as shown in \ref{eq:light_model}. These components are 
+ambient light, subsurface scattering, specular light and enviroement reflection. The final output should look like as shown in figure \ref{fig:output_light}
+\begin{equation}
+    L = L_a + L_{ss} + L_s + L_r
+    \label{eq:light_model}
+\end{equation}
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.50\textwidth]{"images/output_light.png"}
+    \captionof{figure}{Finall Shader Output}
+    \label{fig:output_light}
+\end{minipage}
 
-% \subsubsection{Fresnel Effect}
-% Fresnel effect is the phenomenon where light is more reflective at grazing angles. This effect will be importatnt for specular and reflection calculations.
-% Approximation formula ctakes form of:
-% \begin{equation}
-%     F = (1 - \max(D_V \cdot N, 0.15))^{5}
-% \end{equation}
+\subsubsection{Ambient Light}
+Ambient light is light that does not come from any specific light source, but rather result of light being scattered in the environment. It is constant and does not depend on the direction of the light source.
+For ocean we use  ambient light aproximation formula taken from GDC confference \cite{mark2021}:
+\begin{equation}
+    L_a = k_a N C_a C_l + \rho_a C_b C_l
+\end{equation}
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.40\textwidth]{"images/ambient_light.png"}
+    \captionof{figure}{Ambient Light}
+    \label{fig:ambient_light}
+\end{minipage}
 
-% \subsubsection{Subsurface Scattering}
-% \begin{equation}
-%     \begin{split}
-%         L_S &= (L_{S_1} + L_{S_2}) C_{WS} C_L\\
-%         L_{S_1} &= k_{S_1} \max(0, H) ([D_S, -D_V])^{4}(0.5-0.5(D_s \cdot N))^{3}\\
-%         L_{S_2} &= k_{S_2} ([D_V, N])^{2}
-%     \end{split}
-% \end{equation}
+\subsubsection{Fresnel Effect}
+Fresnel effect is the phenomenon where light is more reflective at grazing angles. This effect will be importatnt for specular and reflection calculations.
+\begin{equation}
+    F = (1 - \max(D_v \cdot N, 0.15))^{5}
+\end{equation}
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.45\textwidth]{"images/fresnel.png"}
+    \captionof{figure}{Fresnel Effect}
+    \label{fig:fresnel_effect}
+\end{minipage}
 
-% \subsubsection{Specular Reflection}
-% \begin{equation}
-%     \begin{split}
-%         D_r 
-%     \end{split}
-% \end{equation}
+\subsubsection{Subsurface Scattering}
+Subsurface scattering is behaviour how light interacts when entering object. In this case how water acts when enttering water body.
+Tipacally we would need to have raytracing for relistic results. Fortunetlly, most of our light is trapped in the ocean and only light in wave peeks can escape. 
+We can use the approximation from from GDC confference \cite{mark2021}.
+\begin{equation}
+    \begin{split}
+        L_{ss} &= (L_{ss_1} + L_{ss_2}) C_{ws} C_l\\
+        L_{ss_1} &= k_{ss_1} \max(0, H) ([D_s, -D_v])^{4}(0.5-0.5(D_s \cdot N))^{3}\\
+        L_{ss_2} &= k_{ss_2} ([D_V, N])^{2}
+    \end{split}
+\end{equation}
+\begin{minipage}{0.32\textwidth}
+    \includegraphics[width=1\textwidth]{"images/ss1_light.png"}
+    \captionof{figure}{$L_{ss_1}$}
+    \label{fig:lss1_light}
+\end{minipage}
+\hfill
+\begin{minipage}{0.32\textwidth}
+    \includegraphics[width=1\textwidth]{"images/ss2_light.png"}
+    \captionof{figure}{$L_{ss_2}$}
+    \label{fig:lss2_light}
+\end{minipage}
+\hfill
+\begin{minipage}{0.32\textwidth}
+    \includegraphics[width=1\textwidth]{"images/ss_light.png"}
+    \captionof{figure}{Subsurface Scattering}
+    \vspace*{-13pt}
+    \label{fig:lss_light}
+\end{minipage}
 
-% \subsubsection{Reflection}
+\subsubsection{Specular Reflection}
+Specular reflection is a light source reflection on the object that we see on the shiny objects like metals or plastic.
+We are using simple phong scatter technique as shown in figure \ref{fig:specular_light} and the formula takes form:
+\begin{equation}
+    \begin{split}
+        L_s &= C_l S C_s F\\
+        S &= [D_v, D_r]^{\text{Shininess}}\\
+        D_r &= \text{reflect}(\text{LightPos}, N)
+    \end{split}
+\end{equation}
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.45\textwidth]{"images/specular_light.png"}
+    \captionof{figure}{Specular Reflection}
+    \label{fig:specular_light}
+\end{minipage}
 
-% \subsubsection{Output}
+\subsubsection{Enviroment Reflection}
+For our project we only going to consider skybox reflection on water surface. As per figure \ref{fig:relfection_light} we show how skybox reflection works on calm ocean surface to better visualise enviroment reflection. 
+\begin{equation}
+    \begin{split}
+        L_r &= F k_r C_{\text{sky}}\\
+        C_{\text{sky}} &= \text{Sky}[\text{reflect}{D_i, N}]
+    \end{split}
+\end{equation}
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.45\textwidth]{"images/reflection_light.png"}
+    \captionof{figure}{Skybox reflection on calm ocean}
+    \label{fig:relfection_light}
+\end{minipage}
 
-\section{Foam}
-
-\subsection{Foam Generation}
+\subsection{Foam}
+\subsubsection{Foam Generation}
 \begin{minipage}{1\textwidth}
     \centering
     \includegraphics[width=0.50\textwidth]{"images/wave_curl.png"}
@@ -342,7 +398,7 @@ in this case $J_{xy} = J_{yx}$.
     \label{fig:foam_texture}
 \end{minipage}
 
-\subsection{Foam Accumilation}
+\subsubsection{Foam Accumilation}
 Curretlly the foam apears and diasapears quicly, however in real life the foam accumilates and disapears over time.
 We can introduce foam accumilation by compering previous and current foam values:
 \begin{lstlisting}[caption={Foam Accumilation}, frame=single, numberstyle=\small\color{gray}, captionpos=b]
@@ -351,6 +407,7 @@ We can introduce foam accumilation by compering previous and current foam values
     float foam = max(accumulation, currentFoam);
 \end{lstlisting}
 This results in pleasing foam accumilation:
+
 \begin{minipage}{1\textwidth}
     \centering
     \includegraphics[width=0.8\textwidth]{"images/ocean_with_foam.png"}
