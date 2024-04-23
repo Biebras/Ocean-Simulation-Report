@@ -26,7 +26,9 @@ sum of sines or gersner waves to more complex techniques such as particle simula
 
 The primary objective of this project is to simulate a realistic ocean surface, 
 one that does not exhibit any tiling or repeating patterns, and that can accurately 
-represent stormy weather conditions. Therefore, using sum of sines or gerstner waves is not sufficient.
+represent stormy weather conditions.
+
+[Missing Logic Linking]
 
 This is achieved by leveraging the power of the Inverse Fourier Transform (IFFT), a mathematical technique that transforms data 
 from the frequency domain back to the time (or spatial) domain. In the context of this project, 
@@ -236,6 +238,34 @@ The basic idea of the FFT algorithm is as follows:
     \end{minipage}
 \end{enumerate}
 
+\section{Ocean Shading}
+\subsection{Phong Shading}
+The Phong shading model, one of the simplest yet effective methods for approximating realistic shading, was proposed by \cite[Phong Bui Tuong, 1975]{phong1975}. This model comprises three components: ambient shading, diffuse shading, and specular shading, as depicted in Figure \ref{fig:phong_shading}.
+The ambient component is a constant value representing the light that is scattered about the entire scene. The diffuse component, on the other hand, can be calculated using the following equation:
+\begin{equation}
+    \text{Diffuse} = \text{max}(\text{Normal} \cdot \text{LightDirection}, 0.0);
+\end{equation}
+Here, the Normal is a normalized vector perpendicular to the surface that points away from the surface.
+The specular component can be calculated as follows:
+\begin{equation}
+    \text{Specular} = max(\text{ViewDir} \cdot \text{ReflectionDir}, 0.0)^{\text{Shininess}}
+\end{equation}
+In this equation, the ViewDir is a normalized vector pointing towards the camera, and the ReflectionDir is a normalized reflection vector with respect to the Normal, as illustrated in Figure \ref{fig:phong_graph}.
+
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.7\textwidth]{"images/phong_shading.png"}
+    \captionof{figure}{Phong Shading \\ Credits: learnopengl.com}
+    \label{fig:phong_shading}
+\end{minipage}
+
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.7\textwidth]{"images/phong_graph.png"}
+    \captionof{figure}{Phong Vectors}
+    \label{fig:phong_graph}
+\end{minipage}
+
 \section{Related Work}
 
 \subsection{Gerstner Waves}
@@ -276,6 +306,16 @@ Particle-based methodologies are frequently employed for the simulation of water
 Recent advancements in Graphics Processing Unit (GPU) technology, in conjunction with research such as that conducted by Libo Huang \cite{huang2021}, are incrementally making particle simulations more viable for ocean simulation. Despite this progress, these techniques demand a high-performance GPU and are not yet amenable to widespread real-time applications.
 
 Moreover, there have been considerable advancements in the application of machine learning to accelerate fluid simulations, as demonstrated by the work of Dmitrii Kochkov \cite{kochkov2021machine}. However, this is out of this projects scope and won't be disccused.
+
+\subsection{Physically Based Rendering (PBR)}
+Earlier mentioned Phong Shading model, does not provide a highly realistic approximation of lighting. To achieve a realistic representation of ocean shading, it is necessary to incorporate a multitude of custom parameters.
+
+Physically Based Rendering (PBR) attempts to address this issue. However, it is important to note that PBR is more of a conceptual framework than a set of rigid rules \cite[Joe Wilson, 2017]{wilson2017}. The PBR rendering model adheres to three primary principles: energy conservation, microfacet support, and the Fresnel effect.
+
+[ELABORATE]
+
+For the specific application of PBR in ocean shading, one can refer to “Wakes Explosions and Lighting: Interactive Water Simulation in Atlas” by Mark Mihelich and Tim Tcheblokov \cite{mark2021}, which provides an in-depth discussion on the subject. For a more general understanding of PBR, “Physically Based Shading in Theory and Practice” by Stephen Hill and Stephen McAuley \cite{stephan2012} offers comprehensive coverage of the topic from 2012 to 2020.
+
 
 
 % Introdunction on my project

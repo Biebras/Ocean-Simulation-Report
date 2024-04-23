@@ -5,8 +5,18 @@
 
 \section{Conclusions}
 
-FFT ocean are fast and produces relistic enought oceans.
+FFT ocean are fast and produces relistic enought oceans.\\
+Having FFT algorithm is crucial and DFT wouldn't be sufficient.\\
+The key of making good ocean is having spectrum that is based on empirical data.\\
+To remove tiling instead of making bigger texture simulation we can simulate diffrent cascades and overlap them thus having more detail and more performance and less tilling\\
+We use modified Phong Shader, however we should switch to PBR as this would give us more relistic results.
+
 
 \section{Ideas for future work}
+Interactive Water\\
+PBR Shading\\
+Buoyancy\\
+Foam Spray\\
 This technique produces realistic oceans in a cost-efficient way suitable for real-time rendering. However, it does not support interactive waves. For that, J. Tessendorf proposed a method called “iWaves” \cite{tessendorf2004} and a later upgraded version “eWaves” \cite{tessendorf2014}.
+
 

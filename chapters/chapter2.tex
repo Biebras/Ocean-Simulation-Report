@@ -265,8 +265,9 @@ Once again we need to perform IFFT \ref{fig:ifft_algorithm} to get horizontal di
 \subsection{Lighting Model}
 
 \subsubsection{Output}
-For our lighting model we going to have 4 components as shown in \ref{eq:light_model}. These components are 
-ambient light, subsurface scattering, specular light and enviroement reflection. The final output should look like as shown in figure \ref{fig:output_light}
+[MENTION PHON SHADING DISCCUSED IN BACKGROUND RESERCH]
+
+Our lighting model, as depicted in Equation \ref{eq:light_model}, comprises four integral components: ambient light, subsurface scattering, specular light, and environmental reflection. The culmination of these components results in the final output, as illustrated in Figure \ref{fig:output_light}
 \begin{equation}
     L = L_a + L_{ss} + L_s + L_r
     \label{eq:light_model}
@@ -279,8 +280,7 @@ ambient light, subsurface scattering, specular light and enviroement reflection.
 \end{minipage}
 
 \subsubsection{Ambient Light}
-Ambient light is light that does not come from any specific light source, but rather result of light being scattered in the environment. It is constant and does not depend on the direction of the light source.
-For ocean we use  ambient light aproximation formula taken from GDC confference \cite{mark2021}:
+Ambient light, a constant illumination that does not depend on the direction of the light source, is the result of light scattering in the environment. For oceanic simulations, we utilize an approximation formula for ambient light derived from the GDC conference \cite{mark2021}: 
 \begin{equation}
     L_a = k_a N C_a C_l + \rho_a C_b C_l
 \end{equation}
@@ -292,7 +292,7 @@ For ocean we use  ambient light aproximation formula taken from GDC confference 
 \end{minipage}
 
 \subsubsection{Fresnel Effect}
-Fresnel effect is the phenomenon where light is more reflective at grazing angles. This effect will be importatnt for specular and reflection calculations.
+The Fresnel effect, a phenomenon where light is more reflective at grazing angles as shown in figure \ref{fig:fresnel_effect}, is crucial for calculations involving specular and reflection:
 \begin{equation}
     F = (1 - \max(D_v \cdot N, 0.15))^{5}
 \end{equation}
@@ -304,9 +304,10 @@ Fresnel effect is the phenomenon where light is more reflective at grazing angle
 \end{minipage}
 
 \subsubsection{Subsurface Scattering}
-Subsurface scattering is behaviour how light interacts when entering object. In this case how water acts when enttering water body.
-Tipacally we would need to have raytracing for relistic results. Fortunetlly, most of our light is trapped in the ocean and only light in wave peeks can escape. 
-We can use the approximation from from GDC confference \cite{mark2021}.
+
+[SAY AS EARLIER MENTIONED]
+
+Subsurface scattering describes the interaction of light when it penetrates an object, in this case, water. While ray tracing would typically be required for realistic results, we can use an approximation from the GDC conference \cite{mark2021} due to the majority of our light being trapped in the ocean, with only light at wave peaks able to escape. 
 \begin{equation}
     \begin{split}
         L_{ss} &= (L_{ss_1} + L_{ss_2}) C_{ws} C_l\\
@@ -334,8 +335,7 @@ We can use the approximation from from GDC confference \cite{mark2021}.
 \end{minipage}
 
 \subsubsection{Specular Reflection}
-Specular reflection is a light source reflection on the object that we see on the shiny objects like metals or plastic.
-We are using simple phong scatter technique as shown in figure \ref{fig:specular_light} and the formula takes form:
+Specular reflection, the reflection of light from a light source on an object, is a characteristic of shiny objects like metals, plastic, or in our case, water. We employ a simple Phong scattering technique, as shown in Figure \ref{fig:specular_light}, and the formula takes the following form:
 \begin{equation}
     \begin{split}
         L_s &= C_l S C_s F\\
@@ -351,7 +351,7 @@ We are using simple phong scatter technique as shown in figure \ref{fig:specular
 \end{minipage}
 
 \subsubsection{Enviroment Reflection}
-For our project we only going to consider skybox reflection on water surface. As per figure \ref{fig:relfection_light} we show how skybox reflection works on calm ocean surface to better visualise enviroment reflection. 
+In our project, we only consider the reflection of the skybox on the water surface. As per Figure \ref{fig:relfection_light}, we illustrate how skybox reflection operates on a calm ocean surface to better visualize environmental reflection.
 \begin{equation}
     \begin{split}
         L_r &= F k_r C_{\text{sky}}\\
