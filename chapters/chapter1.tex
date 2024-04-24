@@ -1,3 +1,4 @@
+\justifying
 \chapter{Introduction and Background Research}
 
 % Introduction
@@ -223,20 +224,23 @@ The basic idea of the FFT algorithm is as follows:
     \end{equation}
     where $i$ is the index of the sample, stage is the current stage and $N$ is the number of samples.
     \item Perform butterfly operations \ref{fig:butterfly_diagram}, where $x$ and $y$ are complex numbers and $W$ is the twiddle factor
+
     \begin{minipage}{1\textwidth}
         \centering
         \includegraphics[width=0.5\textwidth]{"images/butterfly_diagram.png"}
         \captionof{figure}{Butterfly Diagram}
         \label{fig:butterfly_diagram}
     \end{minipage}
+
     \item The butterfly operations are performed in stages \ref{fig:8_butterfly_diagram}. For example, if we have 8 samples, we will have $\log(8) = 3 $ stages. The first stage is for pairs of points (2-point DFTs), the second stage is for groups of four points (4-point DFTs), and so on.
-    \begin{minipage}{1\textwidth}
-        \centering
-        \includegraphics[width=0.7\textwidth]{"images/8_butterfly_diagram.png"}
-        \captionof{figure}{8-point FFT Butterfly Diagram}
-        \label{fig:8_butterfly_diagram}
-    \end{minipage}
 \end{enumerate}
+
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.7\textwidth]{"images/8_butterfly_diagram.png"}
+    \captionof{figure}{8-point FFT Butterfly Diagram}
+    \label{fig:8_butterfly_diagram}
+\end{minipage}
 
 \section{Ocean Shading}
 \subsection{Phong Shading}

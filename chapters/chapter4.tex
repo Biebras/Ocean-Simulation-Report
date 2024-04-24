@@ -1,22 +1,24 @@
+\justifying
 \chapter{Discussion}
 \label{chapter4}
 
-<Everything that comes under the `Results and Discussion' criterion in the mark scheme that has not been addressed in an earlier chapter should be included in this final chapter. The following section headings are suggestions only.>
-
 \section{Conclusions}
 
-FFT ocean are fast and produces relistic enought oceans.\\
-Having FFT algorithm is crucial and DFT wouldn't be sufficient.\\
-The key of making good ocean is having spectrum that is based on empirical data.\\
-To remove tiling instead of making bigger texture simulation we can simulate diffrent cascades and overlap them thus having more detail and more performance and less tilling\\
-We use modified Phong Shader, however we should switch to PBR as this would give us more relistic results.
+The Fast Fourier Transform (FFT) has been instrumental in ocean rendering, providing a remarkably efficient and persuasive approximation. This efficiency is primarily attributable to the use of the JONSWAP spectrum, which is grounded in empirical data. The substantial enhancements in speed are largely credited to the FFT algorithm, without which the use of the Discrete Fourier Transform (DFT) algorithm would render real-time graphics unfeasible.
 
+In our research, we found that the key to creating a realistic ocean lies in the selection of an empirically based spectrum, for which we employed the TMA spectrum. However, despite its efficiency, FFT-based ocean rendering is not yet sufficient to produce an ocean without tiling. To overcome this, we rendered multiple cascades for different wavelengths and superimposed them, effectively rendering the tiling inconspicuous. This approach not only removes tiling, but also enhances the quality of our ocean and reduces the computation expense as we can render multiple smaller textures.
+
+One of the most significant challenges with FFT-based ocean rendering is its limited interactivity with surroundings. As suggested by Jerry Tessendorf in 2001[tessendorf2001], a hybrid approach could be a potential solution to this problem.
+
+For ocean shading, we utilized a modified version of Phong shading, which yielded satisfactory results. However, to further enhance the realism of the ocean, it would be prudent to consider transitioning to Physically-Based Rendering (PBR). This transition could potentially provide a more convincing representation of the ocean.
 
 \section{Ideas for future work}
-Interactive Water\\
-PBR Shading\\
-Buoyancy\\
-Foam Spray\\
-This technique produces realistic oceans in a cost-efficient way suitable for real-time rendering. However, it does not support interactive waves. For that, J. Tessendorf proposed a method called “iWaves” \cite{tessendorf2004} and a later upgraded version “eWaves” \cite{tessendorf2014}.
+In the pursuit of further enhancing the realism and interactivity of our ocean rendering, several advancements are proposed for future exploration.
 
+Firstly, the current model lacks the representation of foam spray, a characteristic feature observed during significant wave crashes. To address this, we propose the integration of a GPU-based particle system, which could potentially simulate the foam spray effect, thereby adding to the visual complexity and realism of the ocean surface.
 
+Secondly, the incorporation of buoyancy is another aspect worth considering. This would allow objects to interact with the ocean in a more realistic manner, adhering to the principles of fluid dynamics.
+
+However, for more complex interactions, such as the ocean’s reaction with the shoreline by reducing wave amplitude, or with ships by creating wakes, a hybrid approach is recommended. This approach would combine the strengths of different methods to achieve a more comprehensive and realistic simulation.
+
+Lastly, to further enhance the visual fidelity of the ocean, we suggest transitioning from our customized Phong shading to Physically-Based Rendering (PBR). This transition could potentially provide a more convincing and physically accurate representation of the ocean surface, thereby contributing to the overall realism of the scene.
