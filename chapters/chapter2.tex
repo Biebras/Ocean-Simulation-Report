@@ -10,6 +10,28 @@
 % ps: use as many figure to show your work as possible
 % figures include: at least one illustration on how your method work and as many figures on the ocean as possible
 
+\section{Library Choice}
+
+In the context of our ocean generation project, we evaluated six potential technologies, which can be categorized into three groups: older APIs, modern APIs, and game engines.
+
+The older APIs category includes OpenGL, an ideal API for learning and cross-platform use. It’s relatively easy to use, but it’s becoming outdated.
+
+The second category, modern APIs, includes Metal, Vulkan, and DirectX. These APIs are more complex to use, but they provide more control over the GPU and lower CPU usage. However, Metal and DirectX are limited to Apple and Microsoft platforms, respectively. In the case of Vulkan, it requires significantly more code to accomplish the same task.
+
+The final category is game engines, specifically Unity and Unreal. These engines are excellent for computer graphics as they offer a wealth of functionality, most importantly, useful UI tools that make development easier. However, they are massive tools with many custom needs, and you need experience to use them correctly.
+
+All these options are viable as they all have the capability to fulfill our project requirements. However, after careful consideration, we chose Unity. The decision was influenced by Unity’s comprehensive suite of tools, including UI design, GPU programming, and a built-in build system. These features significantly streamline the development process, making Unity an optimal choice for our project’s needs.
+
+\section{Utilization of Unity Tools}
+In our project, we strategically employed Unity’s toolset. We used C\# for startup computations, setting the initial conditions and parameters for our project including communication between CPU and GPU.
+
+For the intensive mathematical computations inside compute shaders and vertex and fragment shaders, we utilized the High-Level Shading Language (HLSL) for GPU programming. This approach allowed us to leverage the computational power of the GPU, enhancing the performance and visual fidelity of our project.
+
+Additionally, Unity’s built-in User Interface (UI) system and build system were used for creating interactive UIs and streamlining the compilation process, respectively. These tools collectively contributed to the effective and efficient development of our project.
+
+\section{Version Controll}
+In the development of our project, we adopted GitHub as our version control system. This platform facilitated the systematic management of different versions of our project files. By organizing our project into branches, we were able to work on individual features without affecting the main codebase. This approach not only enhanced the efficiency of our development process but also ensured the integrity and stability of our project.
+
 \section{Algorithm Overview}
 The algorithm can be split into 3 main parts as shown in figure \ref{fig:ocean_algorithm}
 \begin{enumerate}
@@ -163,6 +185,7 @@ where $\mathbf{k} = (k_x, k_y)$, $k_x = 2 * \pi (x_x - n/2)/ l$, $k_y = 2 * \pi 
 and $\mathbf{x} = (x_x, x_y)$ is current position in the texture. 
 
 This spectrum resulted in more relistic looking ocean with intuitive controls: fetch, wind speed, wind angle, depth. Moreover, it didn't require any efort to make the ocean look relistic and it just worked out of the box.
+
 \begin{minipage}{1\textwidth}
     \centering
     \includegraphics[width=0.40\textwidth]{"images/tma_spectrum.png"}
