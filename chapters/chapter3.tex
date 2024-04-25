@@ -10,31 +10,30 @@ The table below presents the performance metrics of our FFT-based ocean generati
 % table for performance
 \begin{table}[h]
     \centering
-    \begin{tabular}{|c|c|c|}
+    \begin{tabular}{|c|c|c|c|}
         \hline
-        \textbf{GPU} & \textbf{Texture Size} & \textbf{Time} \\
+        \textbf{GPU} & \textbf{Texture Size} & \textbf{Cascade Count} & \textbf{Time} \\
         \hline
-        M1 & 256x256 & 8.56ms \\
+        M1 & 256x256 & 3 & 8.56ms \\
         \hline
-        M1 & 512x512 & 43.50ms \\
+        M1 & 512x512 & 3 & 43.50ms \\
         \hline
-        M1 & 1024x1024 & 128.25ms \\
+        M1 & 1024x1024 & 3 & 128.25ms \\
         \hline
-        Nvidia GeForce RTX 4070 & 256x256 & 1.65ms \\
+        Nvidia GeForce RTX 4070 & 256x256 & 3 & 1.65ms \\
         \hline
-        Nvidia GeForce RTX 4070 & 512x512 & 3.29ms \\
+        Nvidia GeForce RTX 4070 & 512x512 & 3 & 3.29ms \\
         \hline
-        Nvidia GeForce RTX 4070  & 1024x1024 & 10.70ms \\
+        Nvidia GeForce RTX 4070 & 1024x1024 & 3 & 10.70ms \\
         \hline
     \end{tabular}
+    \caption{Performance on high and and low end GPU}
+    \label{tab:fft_performance}
 \end{table}
 
 The data reveals that for a texture size of 256x256, both GPUs are capable of rendering the ocean in real-time, demonstrating the broad applicability of our technique. However, as the texture size increases, the performance on the M1 GPU deteriorates significantly, indicating that our technique becomes computationally expensive for weaker GPUs at higher texture sizes.
 
 Interestingly, the use of cascades in our technique mitigates this issue to an extent. Cascades allow us to maintain a relatively consistent level of detail in the ocean’s visual representation, even when the texture size is increased. This feature makes our technique a viable option for game development across a wide range of computer systems, despite the performance variations observed with different GPUs and texture sizes. Thus, our FFT-based ocean generation technique exhibits a balance between visual fidelity and computational efficiency, making it a promising approach for real-time ocean rendering.
-
-\section{Ablation Study}
-
 
 \section{Comparison} 
 
@@ -55,6 +54,45 @@ You can see clear diffrence between "Phillips" spectrum and TMA spectrum:
     \includegraphics[width=0.8\textwidth]{"images/tma_spectrum_comp.png"}
     \captionof{figure}{Height Map using TMA Spectrum}
     \label{fig:tma_spectrum_comp}
+\end{minipage}
+
+\subsection{DFT and FFT}
+The computational complexity of the Discrete Fourier Transform (DFT) and Fast Fourier Transform (FFT) presents a significant contrast. With DFT operating at O(n2) and FFT at a more efficient O(nlog(n)), the difference becomes strikingly apparent when comparing Tables \ref{tab:fft_performance} and \ref{tab:dft_ocean}. This efficiency of FFT proves to be crucial for this project, enabling real-time rendering.
+
+It should be noted that in the table bellow the mesurments were done only for high end gpu as M1 din't have enough power to run the algorithm.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        \textbf{GPU} & \textbf{Texture Size} & \textbf{Cascade Count} & \textbf{Time} \\
+        \hline
+        Nvidia GeForce RTX 4070 & 256x256 & 1 & 18.65ms \\
+        \hline
+        Nvidia GeForce RTX 4070 & 512x512 & 1 & 81.26ms \\
+        \hline
+    \end{tabular}
+    \caption{Performance of DFT}
+    \label{tab:dft_ocean}
+\end{table}
+
+\subsection{Sum of Sins and FFT Based Ocean}
+A comparative analysis of the visual aspects of the Sum of Sins and FFT-based approaches reveals distinct differences. The Sum of Sins approach, while capable of generating waveforms, exhibits a lack of detail that results in less realistic wave movements and energy transfers as shown in figure \ref{fig:naive_calm}. This underperformance becomes dramatically apparent in stormy conditions \ref{fig:naive_stormy}, where the complexity and intensity of wave interactions are not adequately captured. However, the visual fidelity can be enhanced by integrating a pre-generated detailed water normal map, which can add complexity and depth to the visual representation.
+
+In contrast, the FFT-based approach inherently produces more realistic results. It automatically generates highly detailed normal maps, produces chopier waves, and accurately simulates energy transfers, contributing to a more authentic representation of oceanic conditions.
+
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width=1\textwidth]{"images/naive_calm.png"}
+    \captionof{figure}{Sum Of Sines Calm Ocean}
+    \label{fig:naive_calm}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width=1\textwidth]{"images/naive_storm.png"}
+    \captionof{figure}{Sum Of Sines Stormy Ocean}
+    \label{fig:naive_stormy}
 \end{minipage}
 
 \subsection{Real world oceans}
@@ -119,7 +157,6 @@ where each $l$ is the wave length scale of each cascade.
     \captionof{figure}{Height Map using\\ TMA Spectrum}
     \label{fig:fake_stormy_ocean}
 \end{minipage}
-
 \section{Diffrent Outputs}
 
 \begin{minipage}{1\textwidth}
