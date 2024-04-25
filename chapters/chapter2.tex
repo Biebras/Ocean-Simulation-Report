@@ -90,12 +90,12 @@ Currentlly our data is stored in 2D texture. While this algorithm only accepts 1
 By following pseudocode from \cite{flugge2017} we can perform IFFT in 2D:
 
 \begin{lstlisting}[caption={Horizontal Butterfly Operation}, frame=single, numberstyle=\small\color{gray}, captionpos=b]
-    float4 butterflyData = ButterflyTexture[float2(Stage, id.x)];
-    const float2 twiddle = butterflyData.xy;
+    butterflyData = ButterflyTexture[Stage, id.x];
+    twiddle = butterflyData.xy;
     // fetch top butterfly input sample
-    topSignal = PingPong0[float2(butterflyData.z, id.y)].xy;
+    topSignal = PingPong0[butterflyData.z, id.y].xy;
     // fetch bottom butterfly input sample
-    bottomSignal = PingPong0[float2(butterflyData.w, id.y)].xy;
+    bottomSignal = PingPong0[butterflyData.w, id.y].xy;
     // perform butterfly operation
     h = topSignal + ComplexMult(twiddle, bottomSignal);
 \end{lstlisting}
@@ -103,12 +103,12 @@ By following pseudocode from \cite{flugge2017} we can perform IFFT in 2D:
 Notice that we are using ping-pong buffers to store intermediate results, as we need to perform multiple IFFT passes, in total $log_2(n)$ passes.
 After we perform IFFT on each row, we need to perform for each column:
 \begin{lstlisting}[caption={Vertical Butterfly Operation}, frame=single, numberstyle=\small\color{gray}, captionpos=b]
-    float4 butterflyData = ButterflyTexture[float2(Stage, id.y)];
-    const float2 twiddle = butterflyData.xy;
+    butterflyData = ButterflyTexture[Stage, id.y];
+    twiddle = butterflyData.xy;
     // fetch top butterfly input sample
-    topSignal = PingPong0[float2(id.x, butterflyData.z)].xy;
+    topSignal = PingPong0[id.x, butterflyData.z].xy;
     // fetch bottom butterfly input sample
-    bottomSignal = PingPong0[float2(id.x, butterflyData.w)].xy;
+    bottomSignal = PingPong0[id.x, butterflyData.w].xy;
     // perform butterfly operation
     h = topSignal + ComplexMult(twiddle, bottomSignal);
 \end{lstlisting}
@@ -124,12 +124,12 @@ While, our IFFT algorithm expected data to be in the following order:
 \end{equation}
 This causes our data to flip sign in grid like pattern therefore we need to permute our data:
 \begin{lstlisting}[caption={Data Permutation \cite{flugge2017} }, frame=single, numberstyle=\small\color{gray}, captionpos=b]
-    float perms[] = {-1, 1};
-    uint index = int((id.x + id.y) % 2);
-    float perm = perms[index];
-    float h = perm * PingPong1[id.xy].x;
+    signs = {-1, 1};
+    index = (id.x + id.y) % 2;
+    sign = signs[index];
+    h = sign * PingPong1[id.xy].x;
     
-    PingPong0[id.xy] = float4(h, h, h, 1);
+    PingPong0[id.xy] = h
 \end{lstlisting}
 
 \begin{minipage}{1\textwidth}
