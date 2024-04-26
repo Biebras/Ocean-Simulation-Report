@@ -33,6 +33,14 @@ Additionally, Unity’s built-in User Interface (UI) system and build system wer
 In the development of our project, we adopted GitHub as our version control system. This platform facilitated the systematic management of different versions of our project files. By organizing our project into branches, we were able to work on individual features without affecting the main codebase. This approach not only enhanced the efficiency of our development process but also ensured the integrity and stability of our project.
 
 \section{Algorithm Overview}
+
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{"images/ocean_algorithm.png"}
+    \captionof{figure}{Ocean Algorithm}
+    \label{fig:ocean_algorithm}
+\end{minipage}
+
 The algorithm can be split into 3 main parts as shown in figure \ref{fig:ocean_algorithm}
 \begin{enumerate}
     \item Spectrum generation (Only calculated on parameter value change)
@@ -41,16 +49,10 @@ The algorithm can be split into 3 main parts as shown in figure \ref{fig:ocean_a
 \end{enumerate}
 As shown in figure \ref{fig:ocean_algorithm} majority of calculations are done on GPU using HLSL executed inside Unity. As FFT algorith requires input size to be $2^n$ we going to use 512x512 textures as this provides good performance and high enought details. For simplicity in this project we assume that the texture size is $N$x$N$, where $N$ is the size of a texture and $N$ is power of 2.
 
-\begin{minipage}{1\textwidth}
-    \centering
-    \includegraphics[width=0.8\textwidth]{"images/ocean_algorithm.png"}
-    \captionof{figure}{Ocean Algorithm}
-    \label{fig:ocean_algorithm}
-\end{minipage}
 \section{IFFT}
 \subsection{Butterfly Texture \ref{fig:ifft_algorithm}}
 Firstlly we only intrested in IFFT algorithm and we will not use FFT.
-To perform IFFT we going to produce so called butterfly texture by \cite[Fl{\"u}gge Fynn-Jorin]{flugge2017}.
+To perform IFFT we going to produce so called butterfly texture by Fl{\"u}gge Fynn-Jorin \cite{flugge2017}.
 This texture has width of $(log_2(n)$ and height of $n$ and is precomputed and stored inside the GPU memory once, unless the data size changes. This is 4 chanel texture $(W_r, W_i, y_t, y_b)$,
 where $W_r$ and $W_i$ are real and imaginary parts of the twiddle factor, $y_t$ and $y_b$ are top and bottom butterfly indices as shown in \ref{fig:butterfly_diagram}.
 
