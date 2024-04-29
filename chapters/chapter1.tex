@@ -77,7 +77,7 @@ and the Inverse Discrete Fourier Transform (IDFT):
 
 \begin{minipage}{1\textwidth}
     \centering
-    \includegraphics[width=0.40\textwidth]{"images/philips_height_map.png"}
+    \includegraphics[width=0.3\textwidth]{"images/philips_height_map.png"}
     \captionof{figure}{Height Map using J. Tessendorf's Spectrum}
     \label{fig:tessendorf_height}
 \end{minipage}
@@ -109,6 +109,13 @@ By performing the Inverse Discrete Fourier Transform (IDFT):
 \end{equation}
 we obtain the height map \ref{fig:tessendorf_height}, where $\mathbf{x}=(x,y)$ represents the position in the texture.
 
+\subsection{Dispertion Relationship}
+In the study of wave spectra, it is essential to establish a functional relationship between the travel speed of waves and their wavelengths, as stated by Horvath \cite{horvath2015}. This relationship, known as the dispersion relation, is typically denoted by $\omega$. In the context of deep water wave dynamics, the dispersion relation is expressed as follows:
+$$
+\omega^2 = gk
+$$
+where $g$ is gravity and $k$ denotes the magnitude of the wave vector.
+
 \subsection{Tessendorf's Spectrum}
 The appearance of the ocean is largely determined by the spectrum. In his paper, Jerry Tessendorf \cite{tessendorf2001} proposed a modified version of the Phillips spectrum, which we will refer to as Tessendorf's spectrum. This spectrum takes into account various factors such as the amplitude, wind speed, gravity, and the direction of the waves. However, Tessendorf acknowledges that this spectrum has "poor convergence properties at high values of the wavenumber".
 
@@ -129,7 +136,6 @@ The JONSWAP spectrum is defined as follows:
         \end{cases}
     \end{aligned}
 \end{equation}
-
 where F is the fetch (distance to lee shore), $U_{10}$ is the wind speed at 10 meters above the sea level and $\omega$ is angular frequency.
 
 \subsection{The Texel MARSEN ARSLOE (TMA) Spectrum}
@@ -144,7 +150,7 @@ where $h$ is the depth of the water. At first glance, this function seems comple
 
 \begin{minipage}{1\textwidth}
     \centering
-    \includegraphics[width=0.65\textwidth]{"images/tma_correction.png"}
+    \includegraphics[width=0.45\textwidth]{"images/tma_correction.png"}
     \captionof{figure}{$\Phi(\omega, h)$ as a function of $\omega_h$ \cite{hughes1984}}
     \label{fig:tma_correction}
 \end{minipage}
@@ -202,10 +208,10 @@ Lastly, to make this spectrum usable, we need to transform it from $\omega$ to $
     S_{\text{TMA}}(\mathbf{k}) = 2S_{\text{TMA}}(\omega, h) \cdot \frac{d\omega}{dk} / k \cdot \Delta k_x \cdot \Delta k_y
     \label{eq:tma_spectrum_k}
 \end{equation}
-% where in our case, [MAYBE REMOVE THIS????????????]
-% $$
-% \frac{d\omega}{dk} = \frac{g}{2\sqrt{g*\mathbf{k}}}
-% $$
+where in our case,
+$$
+\frac{d\omega}{dk} = \frac{g}{2\sqrt{g*\mathbf{k}}}
+$$
 
 \subsection{Cooley-Tukey Fast Fourier Transform (FFT)}
 When simulating fourier transform ocean the majority of time is spent on converting from frequency domain to time domain, i.e., performing the IFT.
@@ -225,7 +231,7 @@ The basic idea of the FFT algorithm is as follows:
 
     \begin{minipage}{1\textwidth}
         \centering
-        \includegraphics[width=0.5\textwidth]{"images/butterfly_diagram.png"}
+        \includegraphics[width=0.4\textwidth]{"images/butterfly_diagram.png"}
         \captionof{figure}{Butterfly Diagram}
         \label{fig:butterfly_diagram}
     \end{minipage}
@@ -245,7 +251,7 @@ The Phong shading model, proposed by Phong Bui Tuong in 1975 \cite{phong1975}, i
 
 \begin{minipage}{1\textwidth}
     \centering
-    \includegraphics[width=0.7\textwidth]{"images/phong_shading.png"}
+    \includegraphics[width=0.6\textwidth]{"images/phong_shading.png"}
     \captionof{figure}{Phong Shading \\ Credits: learnopengl.com}
     \label{fig:phong_shading}
 \end{minipage}
@@ -257,12 +263,13 @@ The ambient component is a constant value that represents the light scattered th
 In this equation, the Normal is a normalized vector that is perpendicular to the surface and points away from it. The specular component can be calculated as follows:
 \begin{equation}
     \text{Specular} = max(\text{ViewDir} \cdot \text{ReflectionDir}, 0.0)^{\text{Shininess}}
+    \label{eq:phong_specular}
 \end{equation}
 Here, the ViewDir is a normalized vector pointing towards the camera, and the ReflectionDir is a normalized reflection vector with respect to the Normal. These vectors are illustrated in Figure \ref{fig:phong_graph}.
 
 \begin{minipage}{1\textwidth}
     \centering
-    \includegraphics[width=0.5\textwidth]{"images/phong_graph.png"}
+    \includegraphics[width=0.4\textwidth]{"images/phong_graph.png"}
     \captionof{figure}{Phong Vectors}
     \label{fig:phong_graph}
 \end{minipage}

@@ -2,45 +2,45 @@
 \chapter{Results}
 \label{chapter3}
 
-<Results, evaluation (including user evaluation) {\em etc.} should be described in one or more chapters. See the `Results and Discussion' criterion in the mark scheme for the sorts of material that may be included here.>
+%<Results, evaluation (including user evaluation) {\em etc.} should be described in one or more chapters. See the `Results and Discussion' criterion in the mark scheme for the sorts of material that may be included here.>
 \section{Performance}
 
 The table below presents the performance metrics of our FFT-based ocean generation technique on two different GPUs: M1 and Nvidia GeForce RTX 4070. The metrics were recorded for three different texture sizes: 256x256, 512x512, and 1024x1024.
 
-% table for performance
 \begin{table}[h]
     \centering
-    \begin{tabular}{|c|c|c|c|}
-        \hline
+    \begin{tabular}{cccc}
+        \toprule
         \textbf{GPU} & \textbf{Texture Size} & \textbf{Cascade Count} & \textbf{Time} \\
-        \hline
-        M1 & 256x256 & 3 & 8.56ms \\
-        \hline
-        M1 & 512x512 & 3 & 43.50ms \\
-        \hline
-        M1 & 1024x1024 & 3 & 128.25ms \\
-        \hline
-        Nvidia GeForce RTX 4070 & 256x256 & 3 & 1.65ms \\
-        \hline
-        Nvidia GeForce RTX 4070 & 512x512 & 3 & 3.29ms \\
-        \hline
-        Nvidia GeForce RTX 4070 & 1024x1024 & 3 & 10.70ms \\
-        \hline
+        \midrule
+        \multirow{3}{*}{M1} & 256x256 & 3 & 8.56ms \\
+                             & 512x512 & 3 & 43.50ms \\
+                             & 1024x1024 & 3 & 128.25ms \\
+        \midrule
+        \multirow{3}{*}{Nvidia GeForce RTX 4070} & 256x256 & 3 & 1.65ms \\
+                                                  & 512x512 & 3 & 3.29ms \\
+                                                  & 1024x1024 & 3 & 10.70ms \\
+        \bottomrule
     \end{tabular}
     \caption{Performance on high and and low end GPU}
     \label{tab:fft_performance}
 \end{table}
 
-The data reveals that for a texture size of 256x256, both GPUs are capable of rendering the ocean in real-time, demonstrating the broad applicability of our technique. However, as the texture size increases, the performance on the M1 GPU deteriorates significantly, indicating that our technique becomes computationally expensive for weaker GPUs at higher texture sizes.
+For a texture size of 256x256, the M1 GPU took 8.56ms and the Nvidia GeForce RTX 4070 took 1.65ms. This demonstrates that both GPUs are capable of rendering the ocean in real-time, showcasing the broad applicability of our technique.
+
+However, as the texture size increases, the performance on the M1 GPU deteriorates significantly. For instance, the M1 GPU took 43.50ms for a 512x512 texture and 128.25ms for a 1024x1024 texture. This indicates that our technique becomes computationally expensive for weaker GPUs at higher texture sizes.
+
+On the other hand, the Nvidia GeForce RTX 4070 GPU maintained a relatively consistent performance even with increased texture sizes, taking 3.29ms for a 512x512 texture and 10.70ms for a 1024x1024 texture.
 
 Interestingly, the use of cascades in our technique mitigates this issue to an extent. Cascades allow us to maintain a relatively consistent level of detail in the ocean’s visual representation, even when the texture size is increased. This feature makes our technique a viable option for game development across a wide range of computer systems, despite the performance variations observed with different GPUs and texture sizes. Thus, our FFT-based ocean generation technique exhibits a balance between visual fidelity and computational efficiency, making it a promising approach for real-time ocean rendering.
 
+
 \section{Comparison} 
 
-\subsection{Spectrums}
-The main diffrence comes to what kind of spectrum you use for FFT based oceans. The proposed "Phillips" spectrum \ref{fig:phillip_spectrum_comp} by \cite[J. Tessendorf]{tessendorf2001} has issues with energy transformation and following the wind direction. 
-The proposed TMA spectrum \ref{fig:tma_spectrum_comp} handles energy transformation way more relistic and does not have any issues following the wind direction. This is mostly because that TMA is based on empirical data.
-You can see clear diffrence between "Phillips" spectrum and TMA spectrum:
+\subsection{Spectral Analysis} 
+The primary distinction in ocean simulation arises from the type of spectrum utilized in Fast Fourier Transform (FFT) based oceans. The “Phillips” spectrum, proposed by J. Tessendorf \cite{tessendorf2001}, as shown in Figure \ref{fig:phillip_spectrum_comp}, exhibits challenges in energy transformation and adherence to wind direction.
+
+In contrast, the proposed TMA spectrum, depicted in Figure \ref{fig:tma_spectrum_comp}, handles energy transformation in a more realistic manner and does not encounter issues in following the wind direction. This superior performance is primarily attributed to the fact that the TMA spectrum is based on empirical data.
 
 \begin{minipage}{0.48\textwidth}
     \centering
@@ -57,20 +57,17 @@ You can see clear diffrence between "Phillips" spectrum and TMA spectrum:
 \end{minipage}
 
 \subsection{DFT and FFT}
-The computational complexity of the Discrete Fourier Transform (DFT) and Fast Fourier Transform (FFT) presents a significant contrast. With DFT operating at O(n2) and FFT at a more efficient O(nlog(n)), the difference becomes strikingly apparent when comparing Tables \ref{tab:fft_performance} and \ref{tab:dft_ocean}. This efficiency of FFT proves to be crucial for this project, enabling real-time rendering.
-
-It should be noted that in the table bellow the mesurments were done only for high end gpu as M1 din't have enough power to run the algorithm.
+The computational complexity of the DFT and FFT presents a significant contrast. With DFT operating at $O(n^2)$ and FFT at $O(n\log(n))$, the difference becomes strikingly apparent when comparing the tables \ref{tab:dft_ocean} and \ref{tab:fft_performance}. It's clear that the FFT algorithm, even when run on a lower-end M1 GPU, outperforms the DFT algorithm on a high-end Nvidia GeForce RTX 4070 GPU. For instance, the FFT on the M1 GPU for a texture size of 256x256 and 3 cascades takes 8.56ms, while the DFT on the Nvidia GPU for the same texture size but only 1 cascade takes 18.65ms. This is over twice as long, despite the Nvidia GPU being a high-end model. The difference is even more pronounced for larger texture sizes. It should be noted that the DFT was not run on the M1 GPU as it didn't have enough power to execute the algorithm.
 
 \begin{table}[h]
     \centering
-    \begin{tabular}{|c|c|c|c|}
-        \hline
+    \begin{tabular}{cccc}
+        \toprule
         \textbf{GPU} & \textbf{Texture Size} & \textbf{Cascade Count} & \textbf{Time} \\
-        \hline
-        Nvidia GeForce RTX 4070 & 256x256 & 1 & 18.65ms \\
-        \hline
-        Nvidia GeForce RTX 4070 & 512x512 & 1 & 81.26ms \\
-        \hline
+        \midrule
+        \multirow{2}{*}{Nvidia GeForce RTX 4070} & 256x256 & 1 & 18.65ms \\
+                                                  & 512x512 & 1 & 81.26ms \\
+        \bottomrule
     \end{tabular}
     \caption{Performance of DFT}
     \label{tab:dft_ocean}
@@ -97,20 +94,8 @@ In contrast, the FFT-based approach inherently produces more realistic results. 
 
 \subsection{Real world oceans}
 When it comes to calm ocean, the FFT based ocean with TMA spectrum performs extremelly well and holds the desired shape as shown in figures \ref{fig:real_calm_ocean} and \ref{fig:fake_calm_ocean}.
-\begin{table}[h]
-    \centering
-    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-        \hline
-        \textbf{Spectrum} & \textbf{Size} & $\mathbf{l_1}$ & $\mathbf{l_2}$ & $\mathbf{l_3}$ & $\mathbf{\lambda}$ & $\mathbf{U_{10}}$ & \textbf{Fetch} & \textbf{Depth} \\
-        \hline
-        256x256 & TMA & 256 & 100 & 10 & 0.9 & 0.5 m/s & 1000 km & 500 m \\
-        \hline
-    \end{tabular}
-    \caption{Calm Ocean Parameters}
-    \label{tab:calm_ocean}
-\end{table}
 
-\begin{minipage}{0.48\textwidth}
+\begin{minipage}[t]{0.48\textwidth}
     \centering
     \includegraphics[width=1\textwidth]{"images/real_calm_ocean.jpg"}
     \captionsetup{justification=centering}
@@ -118,32 +103,19 @@ When it comes to calm ocean, the FFT based ocean with TMA spectrum performs extr
     \label{fig:real_calm_ocean}
 \end{minipage}
 \hfill
-\begin{minipage}{0.48\textwidth}
+\begin{minipage}[t]{0.48\textwidth}
     \centering
     \includegraphics[width=1\textwidth]{"images/fake_calm_ocean.png"}
-    \captionof{figure}{FFT Calm \\ Ocean}
+    \captionof{figure}{Spectrum: TMA, Size: 256x256, $l_1$: 256, $l_2$: 100, $l_3$: 10, $\lambda$: O.9, $U_{10}$: 0.5 m/s, Fetch: 1000km, Depth: 500m}
     \label{fig:fake_calm_ocean}
 \end{minipage}
+
+where each $l$ is the wave length scale of each cascade.
 
 When it comes to stormy ocean where huge waves is expected the general shape of an ocean is still relistic
 and can hadle the big waves without any trouble, and because of diffrent cascades the tilling is bearlly noticible as shown in the following figures \ref{fig:real_stormy_ocean} and \ref{fig:fake_stormy_ocean}.
 
-\begin{table}[h]
-    \centering
-    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-        \hline
-        \textbf{Spectrum} & \textbf{Size} & $\mathbf{l_1}$ & $\mathbf{l_2}$ & $\mathbf{l_3}$ & $\mathbf{\lambda}$ & $\mathbf{U_{10}}$ & \textbf{Fetch} & \textbf{Depth} \\
-        \hline
-        256x256 & TMA & 700 & 256 & 70 & 0.9 & 21 m/s & 1000 km & 500 m \\
-        \hline
-    \end{tabular}
-    \caption{Stormy Ocean Parameters}
-    \label{tab:stormy_ocean}
-\end{table}
-
-where each $l$ is the wave length scale of each cascade.
-
-\begin{minipage}{0.48\textwidth}
+\begin{minipage}[t]{0.48\textwidth}
     \centering
     \includegraphics[width=1\textwidth]{"images/real_stormy_ocean.png"}
     \captionsetup{justification=centering}
@@ -151,75 +123,36 @@ where each $l$ is the wave length scale of each cascade.
     \label{fig:real_stormy_ocean}
 \end{minipage}
 \hfill
-\begin{minipage}{0.48\textwidth}
+\begin{minipage}[t]{0.48\textwidth}
     \centering
     \includegraphics[width=1\textwidth]{"images/fake_stormy_ocean.png"}
-    \captionof{figure}{Height Map using\\ TMA Spectrum}
+    \captionof{figure}{Spectrum: TMA, Size: 256x256, $l_1$: 700, $l_2$: 256, $l_3$: 70, $\lambda$: O.9, $U_{10}$: 21 m/s, Fetch: 1000km, Depth: 500m}
     \label{fig:fake_stormy_ocean}
 \end{minipage}
+
 \section{Diffrent Outputs}
 
-\begin{minipage}{1\textwidth}
+\begin{minipage}[t]{1\textwidth}
     \centering
-    \includegraphics[width=1\textwidth]{"images/output1.png"}
-    \captionof{figure}{Calm ocean with blue sky}
+    \includegraphics[width=0.75\textwidth]{"images/output1.png"}
+    \captionof{figure}{Spectrum: TMA, Size: 256x256, $l_1$: 400, $l_2$: 100, $l_3$: 10, $\lambda$: O.9, $U_{10}$: 0.5 m/s, Fetch: 1000km, Depth: 500m}
     \label{fig:output_1}
 \end{minipage}
-
-\begin{table}[h]
+\begin{minipage}[t]{1\textwidth}
     \centering
-    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-        \hline
-        \textbf{Spectrum} & \textbf{Size} & $\mathbf{l_1}$ & $\mathbf{l_2}$ & $\mathbf{l_3}$ & $\mathbf{\lambda}$ & $\mathbf{U_{10}}$ & \textbf{Fetch} & \textbf{Depth} \\
-        \hline
-        256x256 & TMA & 400 & 100 & 10 & 2 & 0.5 m/s & 1000 km & 500 m \\
-        \hline
-    \end{tabular}
-    \caption{Calm Ocean Parameters}
-    \label{tab:output_1}
-\end{table}
-
-\begin{minipage}{1\textwidth}
-    \centering
-    \includegraphics[width=1\textwidth]{"images/output2.png"}
-    \captionof{figure}{Stormy Ocean with cloudy enviroment}
+    \includegraphics[width=0.75\textwidth]{"images/output2.png"}
+    \captionof{figure}{Spectrum: TMA, Size: 256x256, $l_1$: 800, $l_2$: 256, $l_3$: 10, $\lambda$: O.95, $U_{10}$: 31 m/s, Fetch: 1000km, Depth: 500m}
     \label{fig:output_2}
 \end{minipage}
 
-\begin{table}[h]
-    \centering
-    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-        \hline
-        \textbf{Spectrum} & \textbf{Size} & $\mathbf{l_1}$ & $\mathbf{l_2}$ & $\mathbf{l_3}$ & $\mathbf{\lambda}$ & $\mathbf{U_{10}}$ & \textbf{Fetch} & \textbf{Depth} \\
-        \hline
-        256x256 & TMA & 800 & 256 & 10 & 0.95 & 31 m/s & 1000 km & 500 m \\
-        \hline
-    \end{tabular}
-    \caption{Stormy Ocean Parameters}
-    \label{tab:output_2}
-\end{table}
-
 \begin{minipage}{1\textwidth}
     \centering
-    \includegraphics[width=1\textwidth]{"images/output3.png"}
-    \captionof{figure}{Ocean with Medium Waves}
+    \includegraphics[width=0.75\textwidth]{"images/output3.png"}
+    \captionof{figure}{Spectrum: TMA, Size: 256x256, $l_1$: 600, $l_2$: 256, $l_3$: 10, $\lambda$: 1.3, $U_{10}$: 12 m/s, Fetch: 1000km, Depth: 500m}
     \label{fig:output_3}
 \end{minipage}
 
-\begin{table}[h]
-    \centering
-    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-        \hline
-        \textbf{Spectrum} & \textbf{Size} & $\mathbf{l_1}$ & $\mathbf{l_2}$ & $\mathbf{l_3}$ & $\mathbf{\lambda}$ & $\mathbf{U_{10}}$ & \textbf{Fetch} & \textbf{Depth} \\
-        \hline
-        256x256 & TMA & 600 & 256 & 10 & 1.3 & 12 m/s & 1000 km & 500 m \\
-        \hline
-    \end{tabular}
-    \caption{Medium Waves Parameters}
-    \label{tab:output_1}
-\end{table}
-
-\section{Known Problems}
+\section{Limitations}
 During the implementation of our FFT-based ocean generation technique, we encountered challenges related to the global application of FFT-generated maps. This global application restricts us from selectively altering specific sections of the sea, such as the wake created by a moving ship or the reduced wave height near a shallow beach.
 
 To address these challenges, J. Tessendorf proposed a hybrid approach in his paper \cite{tessendorf2004}. This approach combines grid-based ocean generation, where each vertex point is propagated individually and FFT waves serve as ambient waves. Tessendorf later enhanced this approach with the release of “eWaves” \cite{tessendorf2014}.

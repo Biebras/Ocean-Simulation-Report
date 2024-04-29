@@ -10,57 +10,44 @@
 % ps: use as many figure to show your work as possible
 % figures include: at least one illustration on how your method work and as many figures on the ocean as possible
 
-\section{Library Choice}
-
-In the context of our ocean generation project, we evaluated six potential technologies, which can be categorized into three groups: older APIs, modern APIs, and game engines.
-
-The older APIs category includes OpenGL, an ideal API for learning and cross-platform use. It’s relatively easy to use, but it’s becoming outdated.
-
-The second category, modern APIs, includes Metal, Vulkan, and DirectX. These APIs are more complex to use, but they provide more control over the GPU and lower CPU usage. However, Metal and DirectX are limited to Apple and Microsoft platforms, respectively. In the case of Vulkan, it requires significantly more code to accomplish the same task.
-
-The final category is game engines, specifically Unity and Unreal. These engines are excellent for computer graphics as they offer a wealth of functionality, most importantly, useful UI tools that make development easier. However, they are massive tools with many custom needs, and you need experience to use them correctly.
-
-All these options are viable as they all have the capability to fulfill our project requirements. However, after careful consideration, we chose Unity. The decision was influenced by Unity’s comprehensive suite of tools, including UI design, GPU programming, and a built-in build system. These features significantly streamline the development process, making Unity an optimal choice for our project’s needs.
-
-\section{Utilization of Unity Tools}
-In our project, we strategically employed Unity’s toolset. We used C\# for startup computations, setting the initial conditions and parameters for our project including communication between CPU and GPU.
-
-For the intensive mathematical computations inside compute shaders and vertex and fragment shaders, we utilized the High-Level Shading Language (HLSL) for GPU programming. This approach allowed us to leverage the computational power of the GPU, enhancing the performance and visual fidelity of our project.
-
-Additionally, Unity’s built-in User Interface (UI) system and build system were used for creating interactive UIs and streamlining the compilation process, respectively. These tools collectively contributed to the effective and efficient development of our project.
-
-\section{Version Controll}
-In the development of our project, we adopted GitHub as our version control system. This platform facilitated the systematic management of different versions of our project files. By organizing our project into branches, we were able to work on individual features without affecting the main codebase. This approach not only enhanced the efficiency of our development process but also ensured the integrity and stability of our project.
-
 \section{Algorithm Overview}
 
 \begin{minipage}{1\textwidth}
     \centering
     \includegraphics[width=0.8\textwidth]{"images/ocean_algorithm.png"}
-    \captionof{figure}{Ocean Algorithm}
+    \captionof{figure}{Ocean Generation Algorithm Stages: (1) Gaussian Noise Generation, (2) Initial Spectrum Creation, (3) Frequency Map Production, and (4) Conversion to Time Domain via IFFT.}
     \label{fig:ocean_algorithm}
 \end{minipage}
+\vspace{0.0cm}
 
-The algorithm can be split into 3 main parts as shown in figure \ref{fig:ocean_algorithm}
+The ocean generation algorithm utilizes the Fast Fourier Transform (FFT) and is designed for the Unity engine. It uses the High-Level Shader Language (HLSL) for GPU computations. The algorithm processes textures of size $N$x$N$, with N being a power of 2, to satisfy the Inverse Fast Fourier Transform (IFFT) data sample requirement. For this project, we use a texture size of 512x512, balancing computational performance and visual realism. The algorithm comprises four main stages, as shown in Figure \ref{fig:ocean_algorithm}.
+
+The algorithm can be split into 4 main parts as shown in figure \ref{fig:ocean_algorithm}
 \begin{enumerate}
-    \item Spectrum generation (Only calculated on parameter value change)
-    \item Frequency generation
-    \item Convertion from frequency to time domain using IFFT
+    \item \textbf{Gaussian Noise Generation:} The first stage involves the generation of Gaussian noise with a mean of 0 and a standard deviation of 1. Two values are generated, one for the real part and the other for the complex part, as shown in Equation \ref{eq:fouier_amplitudes}.
+    \item \textbf{Spectrum Generation:} The second stage involves the generation of the initial spectrum, $\tilde{h}_0(\mathbf{k})$, which is used to generate all subsequent results. The real and imaginary parts of the spectrum are stored as the red and green channels of a texture, respectively. Additionally, a separate texture is used to store the wave vector, $\mathbf{k}$, and the dispersion relation, $\omega$.
+    \item \textbf{Frequency Generation:} In the third stage, the initial spectrum is used to generate a frequency height map for vertical vertex displacement, a frequency normal map for shading, and a frequency horizontal displacement map for horizontal vertex displacement. Furthermore, six values are calculated for the Jacobian, which is used to generate foam. Due to the limitation of a maximum of four values per texture, two textures are used to store the Jacobian values.
+    \item \textbf{Inverse FFT (IFFT) Conversion:} The final stage involves the use of the Inverse Fast Fourier Transform (IFFT) algorithm to convert the maps from the frequency domain to the time domain.
 \end{enumerate}
-As shown in figure \ref{fig:ocean_algorithm} majority of calculations are done on GPU using HLSL executed inside Unity. As FFT algorith requires input size to be $2^n$ we going to use 512x512 textures as this provides good performance and high enought details. For simplicity in this project we assume that the texture size is $N$x$N$, where $N$ is the size of a texture and $N$ is power of 2.
 
 \section{IFFT}
-\subsection{Butterfly Texture \ref{fig:ifft_algorithm}}
-Firstlly we only intrested in IFFT algorithm and we will not use FFT.
-To perform IFFT we going to produce so called butterfly texture by Fl{\"u}gge Fynn-Jorin \cite{flugge2017}.
-This texture has width of $(log_2(n)$ and height of $n$ and is precomputed and stored inside the GPU memory once, unless the data size changes. This is 4 chanel texture $(W_r, W_i, y_t, y_b)$,
-where $W_r$ and $W_i$ are real and imaginary parts of the twiddle factor, $y_t$ and $y_b$ are top and bottom butterfly indices as shown in \ref{fig:butterfly_diagram}.
+
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=1\textwidth]{"images/ifft_algorithm.png"}
+    \captionof{figure}{During the initialization phase, we generate a butterfly texture that stores the twiddle factors and indices. Subsequently, we apply a horizontal IFFT to the signal of size $n_2$, repeating this process $\log_2(n)$ times. The same procedure is then applied to vertical IFFT. Finally, we permute the data to transition from the frequency domain to the time domain.}
+    \label{fig:ifft_algorithm}
+\end{minipage}
+
+\subsection{Butterfly Texture}
+
+Our focus is primarily on the Inverse Fast Fourier Transform (IFFT) algorithm, and we will not be utilizing the FFT. To execute the IFFT, we generate a butterfly texture, as proposed by Fl{\"u}gge Fynn-Jorin \cite{flugge2017}. This texture, which is precomputed and stored in the GPU memory, has a width of $\log_2(n)$ and a height of n. It is a four-channel texture $(W_r,W_i,y_t,y_b)$, where $W_r$ and $W_i$ are the real and imaginary parts of the twiddle factor, and $y_t$ and $y_b$ are the top and bottom butterfly indices, respectively (as shown in Figure \ref{fig:butterfly_diagram}).
 
 In butterfly texture coordinate x represents a stage \ref{fig:8_butterfly_diagram}, while each y represents a butterfly operation between two data points $y_t$ and $y_b$.
 
-In the first stage we assign $y_t$ and $y_b$ in bit reversed order, on the other stages:
+In the first stage we sort our data in bit reversed order, In the subsequent stages, we perform the following operations:
 \begin{itemize}
-    \item If the butterfly wing is top half
+    \item If the butterfly wing is top half as shown in \ref{fig:8_butterfly_diagram}
     \begin{equation}
         \begin{split}
             y_t &= y_{\text{current}} \\
@@ -75,11 +62,11 @@ In the first stage we assign $y_t$ and $y_b$ in bit reversed order, on the other
         \end{split}
     \end{equation}
 \end{itemize}
-We can determine if the wing is upper or lower half:
+We can determine whether the wing is in the upper or lower half using the following equation:
 \begin{equation}
     \text{wing} = y_{\text{current}} \bmod 2^{(\text{stage} + 1)}
 \end{equation}
-Lastlly we need to calculate twiddle factors:
+Finally, we calculate the twiddle factors as follows:
 \begin{equation}
     \begin{split}
         k &= (y_{\text{current}} \cdot n / 2^{\text{stage} + 1}) \bmod n \\
@@ -88,7 +75,7 @@ Lastlly we need to calculate twiddle factors:
 \end{equation}
 
 \subsection{Performing IFFT}
-Currentlly our data is stored in 2D texture. While this algorithm only accepts 1D data. Therefore, we need to perform 1D IFFT on each row "horizontally" and then on each column "vertically" \ref{fig:ifft_algorithm}.
+Our data is currently stored in a 2D texture. However, the IFFT algorithm is designed for 1D data. As a result, we need to perform a 1D IFFT on each row (horizontally) and then on each column (vertically), as shown in Figure \ref{fig:ifft_algorithm}.
 By following pseudocode from \cite{flugge2017} we can perform IFFT in 2D:
 
 \begin{lstlisting}[caption={Horizontal Butterfly Operation}, frame=single, numberstyle=\small\color{gray}, captionpos=b]
@@ -134,23 +121,14 @@ This causes our data to flip sign in grid like pattern therefore we need to perm
     PingPong0[id.xy] = h
 \end{lstlisting}
 
-\begin{minipage}{1\textwidth}
-    \centering
-    \includegraphics[width=0.7\textwidth]{"images/ifft_algorithm.png"}
-    \captionof{figure}{IFFT Algorithm}
-    \label{fig:ifft_algorithm}
-\end{minipage}
-
 \section{Ocean Geometry}
-\subsection{Spectrum Generation}
-
 % Table
 \begin{table}[H]
     \centering
-    \begin{tabular}{|c|c|}
-        \hline
+    \begin{tabular}{cl}
+        \toprule
         \textbf{Symbol} & \textbf{Meaning} \\
-        \hline
+        \midrule
         $S(\omega)$ & Non directional wave spectrum \\
         $S(\omega, \theta)$ & Directional wave spectrum\\
         $S(\mathbf{k})$ & Directional wave spectrum\\
@@ -161,51 +139,34 @@ This causes our data to flip sign in grid like pattern therefore we need to perm
         $U_{10}$ & Wind speed at 10m above the sea level\\
         $F$ & Fetch (Disntance from lee shore)\\
         $\theta_{\text{wind}}$ & Wind angle\\
-        $\lambda$ & Choppy factor\\
-        \hline
+        $\lambda$ & Wave Choppy factor\\
+        \bottomrule
     \end{tabular}
     \caption{Deffinition Table}
     \label{table:deffinition_table}
 \end{table}
 
-Spectrums are responsable for whole look of the ocean. It's importatnt to pick the one that is based on real world data to make our ocean look realistic.
-Initialy, Tessendorf spectrum \ref{eq:tessendorf_spectrum} was implemented as it was straight forward to implement. However, it didn't produce satisfying results, as waves didn't seem to transfer energy in convincing way, waves didn't seem to follow wave direction and it was hard to have artistic control over the ocean.
+\subsection{Spectrum Generation}
 
 \begin{minipage}{1\textwidth}
     \centering
-    \includegraphics[width=0.4\textwidth]{"images/phillips_spectrum.png"}
-    \captionof{figure}{Jerry Tessendorf's Spectrum}
-    \label{fig:phillips_spectrum}
+    \includegraphics[width=0.40\textwidth]{"images/tma_spectrum.png"}
+    \captionof{figure}{TMA spectrum, Frequency Domain}
+    \label{fig:tma_spectrum}
 \end{minipage}
+\vspace{0cm}
 
-Therefore, TMA spectrum \ref{eq:tma_spectrum_k} was implemented.
-
+The choice of spectrum is pivotal to the visual fidelity of an ocean simulation. The Tessendorf spectrum, initially implemented due to its straightforward application, did not yield satisfactory results. The wave energy transfer was unconvincing, the waves did not appear to adhere to the wave direction, and artistic control over the ocean's appearance was challenging. To ensure the realism of the simulated ocean, the TMA spectrum \ref{eq:tma_spectrum_k}, grounded in empirical data, was subsequently implemented:
 $$
     S_{\text{TMA}}(\mathbf{k}) = 2S_{\text{TMA}}(\omega, h) \cdot \frac{d\omega}{dk} / k \cdot \Delta k_x \cdot \Delta k_y
 $$
 where $\mathbf{k} = (k_x, k_y)$, $k_x = 2 * \pi (x_x - n/2)/ l$, $k_y = 2 * \pi (x_y - n/2)/ l$, $l$ is the the length scale of the ocean, 
 and $\mathbf{x} = (x_x, x_y)$ is current position in the texture. 
 
-This spectrum resulted in more relistic looking ocean with intuitive controls: fetch, wind speed, wind angle, depth. Moreover, it didn't require any efort to make the ocean look relistic and it just worked out of the box.
-
-\begin{minipage}{1\textwidth}
-    \centering
-    \includegraphics[width=0.40\textwidth]{"images/tma_spectrum.png"}
-    \captionof{figure}{TMA spectrum, Frequency Domain \\ (100x for better visibility)}
-    \label{fig:tma_spectrum}
-\end{minipage}
+The TMA spectrum \ref{fig:tma_spectrum} resulted in a more realistic ocean simulation, offering intuitive controls over fetch, wind speed, wind angle, and depth. It required minimal effort to achieve a realistic appearance and provided satisfactory results out of the box.
 
 \subsection{Height Map Generation}
 
-To generate height map, firstlly we need to have fourier amplitudes as shown in \ref{eq:fouier_amplitudes}, where $P_h$ is TMA Spectrum $S_{TMA}(\mathbf{k})$.
-For the next step we need to add fourier amplitude and it's complex conjugate to produce "produce waves towards and against the wave direction when propagating"\cite{horvath2015}.
-In our luck we don't need to recalculate complex conjugate as fourier series are symetric, so we can just mirror the amplitudes:
-\begin{equation}
-    \tilde{h}^{*}_0 = T_{h_0}(x^{*}, y^{*})
-\end{equation}
-where $T_{h_0}(x, y)$ is fourier amplitude in precomputed texture at $x^{*} = (n - x) \text{ mod } n$, $y^{*} = (n - y) \text{ mod } n$, $(x, y)$ is current position in the texture.
-
-By having combined amplitudes \ref{eq:combined_amplitudes} we can perform IFFT as shown in \ref{fig:ifft_algorithm} to produce height map.
 \begin{minipage}{1\textwidth}
     \centering
     \includegraphics[width=0.40\textwidth]{"images/tma_height.png"}
@@ -213,14 +174,16 @@ By having combined amplitudes \ref{eq:combined_amplitudes} we can perform IFFT a
     \label{fig:tma_height_map}
 \end{minipage}
 
-\subsection{Normal Map Generation}
-Latter we will need extra information about the ocean to calculate ocean shading. Therefore, we need to calculate normal map. Normal map is perpendicular direction to the surface of the ocean.
-To calculate normal map we need to calculate gradient, which is derivative of the height map. According to \cite{tessendorf2004} the derivative is:
+The generation of a height map begins with the computation of Fourier amplitudes, as shown in Equation \ref{eq:fouier_amplitudes}. Here, $P_h$ represents the TMA Spectrum $S_{TMA}(\mathbf{k})$.
+The symmetry of the Fourier series allows us to mirror the amplitudes, eliminating the need for complex conjugate recalculation. This is represented as:
 \begin{equation}
-    \epsilon(\textbf{x}, t) = i\textbf{k} \tilde{h}(\textbf{k}, t)
+    \tilde{h}^{*}_0 = T_{h_0}(x^{*}, y^{*})
 \end{equation}
-Then we need to perform IFFT \ref{fig:ifft_algorithm} to get normal map in the time domain.
+where $T_{h_0}(x, y)$ is fourier amplitude in precomputed texture at $x^{*} = (n - x) \text{ mod } n$, $y^{*} = (n - y) \text{ mod } n$, $(x, y)$ is current position in the texture.
 
+By having combined amplitudes \ref{eq:combined_amplitudes} we can perform IFFT as shown in \ref{fig:ifft_algorithm} to produce height map as shown in figure \ref{fig:tma_height_map}.
+
+\subsection{Normal Map Generation}
 \begin{minipage}{1\textwidth}
     \centering
     \includegraphics[width=0.40\textwidth]{"images/tma_normal.png"}
@@ -228,60 +191,60 @@ Then we need to perform IFFT \ref{fig:ifft_algorithm} to get normal map in the t
     \label{fig:tma_normal_map}
 \end{minipage}
 
-\subsection{Choppy Waves}
-Currentlly, when rendering ocean it looks too smooth \ref{fig:ocean_no_choppy} and lacks choppiness.
+The generation of a normal map is an essential step in ocean simulation as it provides critical information for calculating ocean shading. A normal map represents the perpendicular direction to the ocean surface at each point.
+The computation of a normal map necessitates the calculation of the gradient, which is the derivative of the height map. As per Tessendorf \cite{tessendorf2004}, the derivative is given by:
+\begin{equation}
+    \epsilon(\textbf{x}, t) = i\textbf{k} \tilde{h}(\textbf{k}, t)
+\end{equation}
+Then we need to perform IFFT \ref{fig:ifft_algorithm} to get normal map \ref{fig:tma_normal_map} in the time domain.
 
-\begin{minipage}{1\textwidth}
+\subsection{Choppy Waves}
+\begin{minipage}{0.49\textwidth}
     \centering
-    \includegraphics[width=0.40\textwidth]{"images/rendered_height_no_coppy.png"}
+    \includegraphics[width=0.8\textwidth]{"images/rendered_height_no_coppy.png"}
     \captionof{figure}{Ocean without Choppy Waves}
     \label{fig:ocean_no_choppy}
 \end{minipage}
+\begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{"images/rendered_height_choppy.png"}
+    \captionof{figure}{Ocean with Choppy Waves}
+    \label{fig:ocean_choppy}
+\end{minipage}
+\vspace{0.3cm}
 
-To make waves choppy we need to introduce horizotal displacement. This will not only make waves more chopy but also make energy transfer between waves more relistic. Following formula from \cite[J. Tessendorf]{tessendorf2004} we can calculate horizontal displacement:
+The current rendering of the ocean (Figure \ref{fig:ocean_no_choppy}) appears excessively smooth and lacks the characteristic choppiness of real-world ocean waves. To address this, we introduce horizontal displacement into our model. This not only enhances the choppiness of the waves but also improves the realism of energy transfer between waves (Figure \ref{fig:ocean_choppy}).
+The calculation of horizontal displacement follows the formula proposed by Tessendorf \cite{tessendorf2004}:
 \begin{equation}
     \mathbf{D}_{\text{hori}}(\textbf{x}, t) = -i\frac{\mathbf{k}}{k}\tilde{h(\mathbf{k}, t)}
 \end{equation}
-Using this horizotal displacement we can displace our verticies:
+Utilizing this horizontal displacement, we can adjust the position of our vertices as follows:
 \begin{equation}
     \mathbf{x} + \lambda \mathbf{D}_{\text{hori}}(\textbf{x}, t)
 \end{equation}
 , where $\lambda$ is "choppy factor".
 Once again we need to perform IFFT \ref{fig:ifft_algorithm} to get horizontal displacement in the time domain.
 
-\begin{minipage}{1\textwidth}
-    \centering
-    \includegraphics[width=0.40\textwidth]{"images/rendered_height_choppy.png"}
-    \captionof{figure}{Ocean with Choppy Waves}
-    \label{fig:ocean_choppy}
-\end{minipage}
-
 \section{Ocean Shading}
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{|c|c|c|}
-        \hline
-        \textbf{Symbol} & \textbf{Parameter} \\
-        \hline
-        $L_a$ & Ambient Light \\
-        $L_ss$ & Subsurface Scatter Light\\
-        $L_s$ & Specular Light\\
-        $L_r$ & Enviroment Reflection\\
-        $N$ & Normal \\
-        $D_s$ & Sun Direction \\
-        $D_v$ & View Direction \\
-        $C_a$ & Ambient Light Color \\
-        $C_l$ & Light Color \\
-        $C_b$ & Air Bubble Color \\
-        $C_{ws}$ & Water Scattering Color \\
-        $H$ & Ocean Height \\
-        $F$ & Fresnel Effect \\
-        $\rho_a$ & Air Bubble Density \\
-        $k_a$ & Ambient Light Intensity \\
-        $k_{ss_1}$ & Subsurface Scattering Intensity \\
-        $k_{ss_2}$ & Subsurface Scattering Intensity \\
-        \hline
+    \begin{tabular}{cl|cl}
+        \toprule
+        \textbf{Symbol} & \textbf{Parameter} & \textbf{Symbol} & \textbf{Parameter} \\
+        \midrule
+        $L_a$ & Ambient Light & $C_{s}$ & Specular Color \\
+        $L_{ss}$ & Subsurface Scatter Light & $C_{ws}$ & Water Scattering Color \\
+        $L_s$ & Specular Light & $C_{\text{sky}}$ & Sky Color \\
+        $L_r$ & Enviroment Reflection & $H$ & Ocean Height \\
+        $N$ & Normal & $F$ & Fresnel Effect \\
+        $D_s$ & Sun Direction & $\rho_a$ & Air Bubble Density \\
+        $D_v$ & View Direction & $k_a$ & Ambient Light Intensity \\
+        $D_i$ & Camera To Fragment Direction & $k_{ss_1}$ & Subsurface Scattering Intensity \\
+        $C_a$ & Ambient Light Color & $k_{ss_2}$ & Subsurface Scattering Intensity \\
+        $C_l$ & Light Color & $k_{r}$ & Reflection Intensity \\
+        $C_b$ & Air Bubble Color & & \\
+        \bottomrule
     \end{tabular}
     \caption{Lighting Parameters}
     \label{table:lighting_parameters}
@@ -290,9 +253,8 @@ Once again we need to perform IFFT \ref{fig:ifft_algorithm} to get horizontal di
 \subsection{Lighting Model}
 
 \subsubsection{Output}
-[MENTION PHON SHADING DISCCUSED IN BACKGROUND RESERCH]
 
-Our lighting model, as depicted in Equation \ref{eq:light_model}, comprises four integral components: ambient light, subsurface scattering, specular light, and environmental reflection. The culmination of these components results in the final output, as illustrated in Figure \ref{fig:output_light}
+The lighting model employed in our simulation, as shown in Equation \ref{eq:light_model}, is a combination of four fundamental components: ambient light, subsurface scattering, specular light, and environmental reflection. This model is the outcome of integrating the Phong model with concepts derived from the Game Developers Conference “Wakes, Explosions and Lighting: Interactive Water Simulation in Atlas” by Mark Mihelich and Tim Tcheblokov \cite{mark2021}. The resultant visual output of this composite lighting model can be observed in Figure \ref{fig:output_light}.
 \begin{equation}
     L = L_a + L_{ss} + L_s + L_r
     \label{eq:light_model}
@@ -330,44 +292,35 @@ The Fresnel effect, a phenomenon where light is more reflective at grazing angle
 
 \subsubsection{Subsurface Scattering}
 
-[SAY AS EARLIER MENTIONED]
-
 Subsurface scattering describes the interaction of light when it penetrates an object, in this case, water. While ray tracing would typically be required for realistic results, we can use an approximation from the GDC conference \cite{mark2021} due to the majority of our light being trapped in the ocean, with only light at wave peaks able to escape. 
 \begin{equation}
     \begin{split}
-        L_{ss} &= (L_{ss_1} + L_{ss_2}) C_{ws} C_l\\
+        L_{ss} &= (1-F) (L_{ss_1} + L_{ss_2}) C_{ws} C_l\\
         L_{ss_1} &= k_{ss_1} \max(0, H) ([D_s, -D_v])^{4}(0.5-0.5(D_s \cdot N))^{3}\\
-        L_{ss_2} &= k_{ss_2} ([D_V, N])^{2}
+        L_{ss_2} &= k_{ss_2} ([D_{v}, N])^{2}
     \end{split}
 \end{equation}
-\begin{minipage}{0.32\textwidth}
+\begin{minipage}[t]{0.32\textwidth}
     \includegraphics[width=1\textwidth]{"images/ss1_light.png"}
     \captionof{figure}{$L_{ss_1}$}
     \label{fig:lss1_light}
 \end{minipage}
 \hfill
-\begin{minipage}{0.32\textwidth}
+\begin{minipage}[t]{0.32\textwidth}
     \includegraphics[width=1\textwidth]{"images/ss2_light.png"}
     \captionof{figure}{$L_{ss_2}$}
     \label{fig:lss2_light}
 \end{minipage}
 \hfill
-\begin{minipage}{0.32\textwidth}
+\begin{minipage}[t]{0.32\textwidth}
     \includegraphics[width=1\textwidth]{"images/ss_light.png"}
     \captionof{figure}{Subsurface Scattering}
-    \vspace*{-13pt}
     \label{fig:lss_light}
 \end{minipage}
 
 \subsubsection{Specular Reflection}
-Specular reflection, the reflection of light from a light source on an object, is a characteristic of shiny objects like metals, plastic, or in our case, water. We employ a simple Phong scattering technique, as shown in Figure \ref{fig:specular_light}, and the formula takes the following form:
-\begin{equation}
-    \begin{split}
-        L_s &= C_l S C_s F\\
-        S &= [D_v, D_r]^{\text{Shininess}}\\
-        D_r &= \text{reflect}(\text{LightPos}, N)
-    \end{split}
-\end{equation}
+Specular reflection is like the shiny reflection we see on smooth surfaces. It's what makes things like metals, plastics, and in our case water look glossy. In our simulation, we utilize the Phong specular reflection model (Equation \ref{eq:phong_specular}) and incorporate the Fresnel effect, denoted by F. The specular reflection can be observed in Figure \ref{fig:specular_light}.
+
 \begin{minipage}{1\textwidth}
     \centering
     \includegraphics[width=0.45\textwidth]{"images/specular_light.png"}
@@ -380,7 +333,7 @@ In our project, we only consider the reflection of the skybox on the water surfa
 \begin{equation}
     \begin{split}
         L_r &= F k_r C_{\text{sky}}\\
-        C_{\text{sky}} &= \text{Sky}[\text{reflect}{D_i, N}]
+        C_{\text{sky}} &= \text{Sky}[\text{reflect}({D_i, N})]
     \end{split}
 \end{equation}
 \begin{minipage}{1\textwidth}
@@ -414,7 +367,7 @@ where,
         1 + \lambda\frac{\partial D_y(\mathbf{x})}{\partial x} & 1 + \lambda\frac{\partial D_y(\mathbf{x})}{\partial y} 
     \end{bmatrix} 
 \end{equation}
-in this case $J_{xy} = J_{yx}$.
+in this case $J_{xy} = J_{yx}$. After appling IFFT, the results can be observed in figure \ref{fig:foam_texture}.
 
 \begin{minipage}{1\textwidth}
     \centering
@@ -427,11 +380,11 @@ in this case $J_{xy} = J_{yx}$.
 Curretlly the foam apears and diasapears quicly, however in real life the foam accumilates and disapears over time.
 We can introduce foam accumilation by compering previous and current foam values:
 \begin{lstlisting}[caption={Foam Accumilation}, frame=single, numberstyle=\small\color{gray}, captionpos=b]
-    float accumulation = 
+    accumulation = 
     LastFoamValue - FoamDecay * DeltaTime / max(currentFoam, 0.5);
-    float foam = max(accumulation, currentFoam);
+    foam = max(accumulation, currentFoam);
 \end{lstlisting}
-This results in pleasing foam accumilation:
+This results in pleasing foam accumilation (Figure \ref{fig:ocean_with_foam}):
 
 \begin{minipage}{1\textwidth}
     \centering
@@ -473,7 +426,7 @@ This results ocean that has less tilling and more detail \ref{fig:ocean_with_cas
     \label{fig:ocean_with_cascades}
 \end{minipage}
 
-One of the main pros of having multiple cascades is reduction in performance cost, as we can have similar results of 512x512 with 3x(256x256) xtextures as shown in figure \ref{fig:ocean_with_cascades_256}.
+One of the main pros of having multiple cascades is reduction in performance cost, as we can have similar results of 512x512 with 3x(256x256) textures as shown in figure \ref{fig:ocean_with_cascades_256}.
 
 \begin{minipage}{1\textwidth}
     \centering
@@ -482,34 +435,24 @@ One of the main pros of having multiple cascades is reduction in performance cos
     \label{fig:ocean_with_cascades_256}
 \end{minipage}
 
-% Before we start, all callculations were taken inside GPU, using HLSL language. This allows us to use parallelism and speed up the process dramatically.
-% As FFT requires our sample data length be power of 2, we will use $n \cdot n = 512 \text{x} 512$ textures to represent our data.
+\section{Library Choice}
 
-% \section{Spectrum Generation}
-% \subsection{Tessendorf Spectrum}
-% To generate height map \ref{eq:height_map} for our ocean we firstly need to generate spectrum. Firstlly, I chose to use J. Tessendorf's spectrum model \ref{eq:tessendorf_spectrum} as this was straight forward to implement:
-% $$
-% P_h(\mathbf{k}) = A \frac{e^{-1/(kl)^{2}}}{k^{4}}| \mathbf{\hat{k}} \cdot \mathbf{w} |^{6}
-% $$
-% where $\mathbf{k} = (k.x, k.y)$, $k.x = 2 * \pi (x.x - n/2)/ l$, $k.y = 2 * \pi (x.y - n/2)/ l$, $l$ is the the length scale of the ocean, 
-% anx $\mathbf{x} = (x.x, x.y)$ is current position in the texture. 
+In the context of our ocean generation project, we evaluated six potential technologies, which can be categorized into three groups: older APIs, modern APIs, and game engines.
 
-% \subsection{TMA Spectrum}
-% However, this model was not perfect, as it produced waves that didn't seem to transfer energy in the right way and the waves didn't seem to follow wave dircetion.
-% Therefore, I decided to use JONSWAP spectrum with TMA correction that was suggested by \cite{horvath2015} \ref{eq:tma_spectrum}, however in our case $h$ will be constant therefore we can rewrite the function as:
-% \begin{equation}
-%     S_{TMA}(\omega) = S_{JONSWAP}(\omega) \cdot S_{TMA}(\omega)    
-% \end{equation}
-% Currentlly, we have two problems with this equation. Firstlly, this spectrum is non-directional, so we need to add directionality to it. Secondly, 
-% this spectrum accepts $\omega$ as input, but as we following J. Tessendorf's \cite{tessendorf2001} paper, we need to use $\mathbf{k}$ as input. 
+The older APIs category includes OpenGL, an ideal API for learning and cross-platform use. It’s relatively easy to use, but it’s becoming outdated.
 
-% \subsection{Directional Spectrum}
+The second category, modern APIs, includes Metal, Vulkan, and DirectX. These APIs are more complex to use, but they provide more control over the GPU and lower CPU usage. However, Metal and DirectX are limited to Apple and Microsoft platforms, respectively. In the case of Vulkan, it requires significantly more code to accomplish the same task.
 
+The final category is game engines, specifically Unity and Unreal. These engines are excellent for computer graphics as they offer a wealth of functionality, most importantly, useful UI tools that make development easier. However, they are massive tools with many custom needs, and you need experience to use them correctly.
 
+All these options are viable as they all have the capability to fulfill our project requirements. However, after careful consideration, we chose Unity. his choice was primarily driven by our greater familiarity with Unity compared to other tools. Furthermore, Unity offers a comprehensive suite of tools, encompassing UI design, GPU programming, and an integrated build system. These features significantly streamline the development process, rendering Unity as the optimal choice for our project's needs.
 
-% According earlier expressed equation \ref{eq:height_map} we use DFT to calculate height map. Because we going to use FFT we can remove the exponential part as this will be calculated inside FFT algorithm:
-% \begin{equation}
-%     h(\mathbf{x}) = \sum_{\mathbf{k}} \tilde{h}(\mathbf{k}, t)
-% \end{equation}
-% , we can see that fft-based representation expresses ocean height at horizontal plane $\mathbf{x} = (x, y)$ "as the sum of sinusoids with complex, time-dependent amplitudes"\cite{tessendorf2001}.
-% where, $\mathbf{k} = 2\pi $
+\section{Utilization of Unity Tools}
+In our project, we strategically employed Unity’s toolset. We used C\# for startup computations, setting the initial conditions and parameters for our project including communication between CPU and GPU.
+
+For the intensive mathematical computations inside compute shaders and vertex and fragment shaders, we utilized the High-Level Shading Language (HLSL) for GPU programming. This approach allowed us to leverage the computational power of the GPU, enhancing the performance and visual fidelity of our project.
+
+Additionally, Unity’s built-in User Interface (UI) system and build system were used for creating interactive UIs and streamlining the compilation process, respectively. These tools collectively contributed to the effective and efficient development of our project.
+
+\section{Version Controll}
+In the development of our project, we adopted GitHub as our version control system. This platform facilitated the systematic management of different versions of our project files. By organizing our project into branches, we were able to work on individual features without affecting the main codebase. This approach not only enhanced the efficiency of our development process but also ensured the integrity and stability of our project.
