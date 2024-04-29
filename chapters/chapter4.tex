@@ -8,7 +8,7 @@ The Fast Fourier Transform (FFT) has been instrumental in ocean rendering, provi
 
 In our research, we found that the key to creating a realistic ocean lies in the selection of an empirically based spectrum, for which we employed the TMA spectrum. However, despite its efficiency, FFT-based ocean rendering is not yet sufficient to produce an ocean without tiling. To overcome this, we rendered multiple cascades for different wavelengths and superimposed them, effectively rendering the tiling inconspicuous. This approach not only removes tiling, but also enhances the quality of our ocean and reduces the computation expense as we can render multiple smaller textures.
 
-One of the most significant challenges with FFT-based ocean rendering is its limited interactivity with surroundings. As suggested by Jerry Tessendorf in 2001[tessendorf2001], a hybrid approach could be a potential solution to this problem.
+One of the most significant challenges with FFT-based ocean rendering is its limited interactivity with surroundings. As suggested by Jerry Tessendorf (2004) \cite{tessendorf2004}, a hybrid approach could be a potential solution to this problem.
 
 For ocean shading, we utilized a modified version of Phong shading, which yielded satisfactory results. However, to further enhance the realism of the ocean, it would be prudent to consider transitioning to Physically-Based Rendering (PBR). This transition could potentially provide a more convincing representation of the ocean.
 

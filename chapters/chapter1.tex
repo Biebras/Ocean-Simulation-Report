@@ -24,15 +24,15 @@ In video games it used for inteactivity and visual apeal, while in movies it is 
 There are many techniques that have been developed to simulate ocean surfaces, from the simple algorithms as 
 sum of sines or Gersner waves to more complex techniques such as particle simulations or Fast Fourier Transform (FFT) based Ocean \ref{fig:ocean_simulation}.
 
-An essential aspect of ocean surface simulation is shading, which adds depth and realism to the rendered image. Two commonly used models for this purpose are Phong Shading and Physically Based Rendering (PBR). Phong Shading provides a balance between simplicity and visual quality, making it a popular choice for various applications. On the other hand, PBR offers a more realistic rendering by accurately simulating the interaction of light with different materials.
+An essential aspect of ocean surface simulation is shading, which adds depth and realism to the rendered image. Two commonly used models for this purpose are Phong Shading and Physically Based Rendering (PBR). Phong Shading provides a balance between simplicity and visual quality, making it a popular choice for various applications. On the other hand, PBR offers a more realistic rendering by accurately simulating the interaction of light with different materials. [DOES NOT SEEM AS INTRODUCTION]
 
-\textit{The primary objective of this project is to simulate a realistic ocean surface, one that does not exhibit any tiling or repeating patterns, and that can accurately represent stormy weather conditions. An important aspect of achieving this realism is the careful shading of the ocean surface. Furthermore, we aim to achieve this simulation in real time, making it compatible with both low-end and high-end GPUs.}
+\textit{The primary objective of this project is to simulate a realistic ocean surface, one that does not exhibit any tiling or repeating patterns, and that can accurately represent stormy weather conditions. An important aspect of achieving this realism is the careful shading of the ocean surface. Furthermore, we aim to achieve this simulation in real time, making it compatible with both low-end and high-end GPUs.} [MAKE SURE THAT GOAL ALLIGNS EVERYWHERE]
 
 This is achieved by leveraging the power of the Inverse Fourier Transform (IFFT), a mathematical technique that transforms data 
 from the frequency domain back to the time (or spatial) domain. In the context of this project, 
 it allows us to transform the frequency data of the ocean waves into a spatial representation, i.e., the height map of the ocean surface. This is
 desireble as it allows us to simulate realistic ocean surfaces that are not only visually appealing, but also physically accurate as 
-we are using real-world data to generate frequencies.
+we are using real-world data to generate frequencies. [MAYBE???]
 
 \begin{minipage}{1\textwidth}
     \centering
@@ -44,15 +44,15 @@ we are using real-world data to generate frequencies.
 \section{Related Work}
 
 \subsection{Gerstner Waves}
-Gerstner waves, first introduced by F.J. Gerstner in 1802 \cite{Franz1809}, provide a simple model for generating somewhat realistic ocean waves. This model is predominantly used in video games, including major titles like “Pokemon Legends: Arceus”. The model approximates the motion of ocean waves by assuming that each point in the ocean undergoes a circular motion. 
+Gerstner waves, first introduced by F.J. Gerstner (1802) \cite{Franz1809}, provide a simple model for generating somewhat realistic ocean waves. This model is predominantly used in video games, including major titles like “Pokemon Legends: Arceus”. The model approximates the motion of ocean waves by assuming that each point in the ocean undergoes a circular motion. 
 
 The Gerstner waves model is limited to a single wave. To simulate more complex ocean surfaces, multiple waves are summed together. However, this approach can be computationally expensive when simulating realistic ocean surfaces, as it requires summing a large number of waves together. 
 
 Furthermore, Gerstner waves offer limited artistic control, can result in visible tiling, and underperform in simulating stormy weather conditions.
 
 \subsection{Fourier Transform}
-The Fourier Transform is a mathematical method that enables us to convert our data from the time domain to the frequency domain, and vice versa. To simplify, imagine we have a smoothie that’s too sour. With the Fourier Transform, we could deconstruct our smoothie (time domain) into its ingredients (frequency domain), remove the sour component, and then reconstruct it back.
-It was invented by Joseph Fourier\cite{fourier1822} in 1822 and it is used in many fields, including signal, image processing, and in our case ocean simulation.
+[MAYBE TALK WHY WE FIRST TALK ABOUT FT???]The Fourier Transform is a mathematical method that enables us to convert our data from the time domain to the frequency domain, and vice versa. To simplify, imagine we have a smoothie that’s too sour. With the Fourier Transform, we could deconstruct our smoothie (time domain) into its ingredients (frequency domain), remove the sour component, and then reconstruct it back.
+It was invented by Joseph Fourier (1822) \cite{fourier1822} and it is used in many fields, including signal, image processing, and in our case ocean simulation.
 
 To convert our data from the time domain to the frequency domain, we use the Fourier Transform:
 \begin{equation}
@@ -83,7 +83,7 @@ and the Inverse Discrete Fourier Transform (IDFT):
 \end{minipage}
 
 \vspace{0.3cm}
-A significant challenge associated with the utilization of Gerstner waves is the necessity to generate multiple waves for each vertex in order to simulate an ocean. This process can be computationally intensive, particularly considering that an oceanic simulation may be constructed of hundred of thousands vertices. In response to this computational demand, J. Tessendorf \cite{tessendorf2001} proposed a method for generating ocean waves using the Fourier Transform.
+A significant challenge associated with the utilization of Gerstner waves is the necessity to generate multiple waves for each vertex in order to simulate an ocean. This process can be computationally intensive, particularly considering that an oceanic simulation may be constructed of hundred of thousands vertices. In response to this computational demand, J. Tessendorf (2001) \cite{tessendorf2001} proposed a method for generating ocean waves using the Fourier Transform.
 
 The core concept involves generating a height map of the ocean surface in the frequency domain and converting it back to the time domain using the Inverse Fourier Transform (IFT). The IFT yields a periodic height map, which can be tiled to simulate an infinite ocean surface. This allows us to generate a single texture and apply it across the entire water body.
 
@@ -94,9 +94,9 @@ To produce the height map, we first need a function that approximates the freque
     \tilde{h}_0(\mathbf{k}) = \frac{1}{\sqrt{2}}(\xi_r + \xi_i)\sqrt{P_h(\mathbf{k})}
     \label{eq:fouier_amplitudes}
 \end{equation}
-where $\xi_r$ and $\xi_i$ are complex numbers drawn from a Gaussian random number generator with mean 0 and standard deviation 1, $P_h$ is modified Phillips spectrum, and $\mathbf{k}$ is a wave vector.
+where $\xi_r$ and $\xi_i$ [MAYBE CLERIFY THE COMPLEX NUMBER???] is a complex number drawn from a Gaussian random number generator with mean 0 and standard deviation 1, $P_h$ is modified Phillips spectrum, and $\mathbf{k}$ is a wave vector.
 
-We then combine $\tilde{h}_0(\mathbf{k})$ with its conjugate $\tilde{h}^{*}_0(-\mathbf{k})$, to "produce waves towards and against the wave direction when propagating"\cite{horvath2015}:
+We then combine $\tilde{h}_0(\mathbf{k})$ with its conjugate $\tilde{h}^{*}_0(-\mathbf{k})$, to "produce waves towards and against the wave direction when propagating"\cite{horvath2015} [INCLUDE NAME???]:
 \begin{equation}
     \tilde{h}(\mathbf{k}, t) = \tilde{h}_0(\mathbf{k})e^{i\omega(k)t}+\tilde{h}^{*}_0(-\mathbf{k})e^{-i\omega(k)t}
     \label{eq:combined_amplitudes}
@@ -110,17 +110,17 @@ By performing the Inverse Discrete Fourier Transform (IDFT):
 we obtain the height map \ref{fig:tessendorf_height}, where $\mathbf{x}=(x,y)$ represents the position in the texture.
 
 \subsection{Dispertion Relationship}
-In the study of wave spectra, it is essential to establish a functional relationship between the travel speed of waves and their wavelengths, as stated by Horvath \cite{horvath2015}. This relationship, known as the dispersion relation, is typically denoted by $\omega$. In the context of deep water wave dynamics, the dispersion relation is expressed as follows:
+In the study of wave spectra, it is essential to establish a functional relationship "between the travel speed of waves and their wavelengths", as stated by Christopher J Horvath (2015) \cite{horvath2015}. This relationship, known as the dispersion relation, is typically denoted by $\omega$. In the context of deep water wave dynamics, the dispersion relation is expressed as follows:
 $$
 \omega^2 = gk
 $$
 where $g$ is gravity and $k$ denotes the magnitude of the wave vector.
 
 \subsection{Tessendorf's Spectrum}
-The appearance of the ocean is largely determined by the spectrum. In his paper, Jerry Tessendorf \cite{tessendorf2001} proposed a modified version of the Phillips spectrum, which we will refer to as Tessendorf's spectrum. This spectrum takes into account various factors such as the amplitude, wind speed, gravity, and the direction of the waves. However, Tessendorf acknowledges that this spectrum has "poor convergence properties at high values of the wavenumber".
+The appearance of the ocean is largely determined by the spectrum. In his paper, Jerry Tessendorf (2001) \cite{tessendorf2001} proposed a modified version of the Phillips spectrum, which we will refer to as Tessendorf's spectrum. This spectrum takes into account various factors such as the amplitude, wind speed, gravity, and the direction of the waves. However, Tessendorf acknowledges that this spectrum has "poor convergence properties at high values of the wavenumber" \cite{tessendorf2001}.
 
 \subsection{JONSWAP Spectrum}
-In response to the challenges experienced with the "Tessendorf's Spectrum", Horvath Christopher \cite{horvath2015} proposed an alternative: the JONSWAP spectrum. The acronym JONSWAP stands for "Joint North Sea Wave Project", and the spectrum was initially developed by Hasselmann et al. in 1973 \cite{hasselmann1973}. This spectrum represents an improvement over the Pierson-Moskowitz Spectrum \cite{pierson1964}. Horvath's key observation was that the wave spectrum is never fully developed. This led him to introduce an extra peak enhancement factor, denoted as $\gamma^r$, into the JONSWAP spectrum.
+In response to the challenges experienced with the "Tessendorf's Spectrum", Horvath (2015) \cite{horvath2015} proposed an alternative: the JONSWAP (Joint North Sea Wave Project) spectrum. The spectrum was initially developed by Hasselmann et al. (1973) \cite{hasselmann1973}. This spectrum represents an improvement over the Pierson-Moskowitz Spectrum (1964) \cite{pierson1964}. Horvath's key observation was that the wave spectrum is never fully developed. This led him to introduce an extra peak enhancement factor, denoted as $\gamma^r$, into the JONSWAP spectrum.
 The JONSWAP spectrum is defined as follows:
 \begin{equation}
     \begin{aligned}
@@ -139,7 +139,7 @@ The JONSWAP spectrum is defined as follows:
 where F is the fetch (distance to lee shore), $U_{10}$ is the wind speed at 10 meters above the sea level and $\omega$ is angular frequency.
 
 \subsection{The Texel MARSEN ARSLOE (TMA) Spectrum}
-One of the limitations of the JONSWAP spectrum is that it only applies to deep waters. To address this, Horvath Christopher \cite{horvath2015} proposed the use of the TMA correction for the deep water spectrum. The TMA was developed by Steven A. Hughes \cite{hughes1984}, based on observations made by Kitaigordskii \cite{kitaigordskii1975}. This is known as the Kitaigordskii depth Attenuation function, which is defined as follows:
+One of the limitations of the JONSWAP spectrum is that it only applies to deep waters. To address this, Horvath Christopher \cite{horvath2015} proposed the use of the TMA correction for the deep water spectrum. The TMA was developed by Steven A. Hughes (1984) \cite{hughes1984}, based on observations made by Kitaigordskii (1975) \cite{kitaigordskii1975}. This is known as the Kitaigordskii depth Attenuation function, which is defined as follows:
 \begin{equation}
     \begin{aligned}
         \Phi(\omega_h) &= \left[ \frac{(k(\omega, k))^{-3}\frac{\partial k(\omega, h)}{\partial \omega}}{(k(\omega, \infty ))^{-3}\frac{\partial k(\omega, \infty)}{\partial \omega}} \right] \\
@@ -155,7 +155,7 @@ where $h$ is the depth of the water. At first glance, this function seems comple
     \label{fig:tma_correction}
 \end{minipage}
 
-Approximation given by Thomson and Vincent \cite{thompson1983} is:
+Approximation given by Thomson and Vincent (1983) \cite{thompson1983} is:
 \begin{equation}
     \begin{aligned}
         &\Phi(\omega, h) \approx
@@ -173,8 +173,8 @@ With $\Phi(\omega, h)$ we can now correct the JONSWAP spectrum for shallow water
 \end{equation}
 
 \subsubsection{Donelan-Banner Directional Spreading}
-Currently, the TMA spectrum cannot be used for our project due to a few issues. Firstly, this spectrum is non-directional, so we need to add directionality to it. Secondly, this spectrum accepts $\omega$ as input, but as we are following J. Tessendorf's \cite{tessendorf2001} paper, we need to use $\mathbf{k}$ as input.
-To solve the first problem Horvath Christopher \cite{horvath2015} proposes to use Donelan-Banner Directional Spreading \cite{young1999}:
+Currently, the TMA spectrum cannot be used for our project due to a few issues. Firstly, this spectrum is non-directional, so we need to add directionality to it. Secondly, this spectrum accepts $\omega$ as input, but as we are following J. Tessendorf's (2001) \cite{tessendorf2001} paper, we need to use $\mathbf{k}$ as input.
+To solve the first problem Horvath Christopher (2015) \cite{horvath2015} proposes to use Donelan-Banner Directional Spreading (1999) \cite{young1999}:
 \begin{equation}
     D(\omega, \theta) = \frac{\beta_s}{2 \tanh(\beta_s\pi)}\text{sech}(\beta_s\theta)^{2}
 \end{equation}
@@ -203,7 +203,7 @@ Now we can combine the TMA spectrum with the Donelan-Banner Directional Spreadin
 \end{equation}
 
 \subsubsection{TMA transformation}
-Lastly, to make this spectrum usable, we need to transform it from $\omega$ to $\mathbf{k}$. According to Horvath Christopher \cite{horvath2015}, we can transform it as follows:
+Lastly, to make this spectrum usable, we need to transform it from $\omega$ to $\mathbf{k}$. According to Horvath Christopher (2015) \cite{horvath2015}, we can transform it as follows:
 \begin{equation}
     S_{\text{TMA}}(\mathbf{k}) = 2S_{\text{TMA}}(\omega, h) \cdot \frac{d\omega}{dk} / k \cdot \Delta k_x \cdot \Delta k_y
     \label{eq:tma_spectrum_k}
@@ -216,13 +216,13 @@ $$
 \subsection{Cooley-Tukey Fast Fourier Transform (FFT)}
 When simulating fourier transform ocean the majority of time is spent on converting from frequency domain to time domain, i.e., performing the IFT.
 The previously mentioned IDFT \ref{eq:idft} has time complexity of $O(n^2)$, which is clearly insufficient for simulating higher resolution ocean surfaces in real time.
-To address this, the Fast Fourier Transform (FFT) algorithm was invented by Gauss Carl Friedrich in 1805 \cite{gauss1866} and later reinvented by Cooley James W. and Tukey John W. in 1965 \cite{cooley1965}. 
+To address this, the Fast Fourier Transform (FFT) algorithm was invented by Gauss Carl Friedrich (1805) \cite{gauss1866} and later reinvented by Cooley James W. and Tukey John W. (1965) \cite{cooley1965}. 
 The FFT algorithm, with a time complexity of $O(n\log n)$, exploits the redundancy in the computation of the DFT to reduce the time complexity. It's important to note that the FFT algorithm only works when the number of samples is a power of 2.
 
 The basic idea of the FFT algorithm is as follows:
 \begin{enumerate}
     \item Split the input data into two subsets: one containing the even samples and the other containing the odd samples. Repeat this process until each subset contains only 2 samples (this is known as bit-reverse sort order).
-    \item Generate twiddle factor $W_N = e^{-i 2 \pi k / N}$ and rise it to the power of \\
+    \item Generate twiddle factor $W_N = e^{-i 2 \pi k / N}$ and rise it to the power of [MAYBE TALK MORE ABOUT TWIDLE???]\\
     \begin{equation}
         k = i * N / 2^{\text{stage} + 1} \text{ mod } N
     \end{equation}
@@ -247,7 +247,7 @@ The basic idea of the FFT algorithm is as follows:
 \end{minipage}
 
 \subsection{Phong Shading}
-The Phong shading model, proposed by Phong Bui Tuong in 1975 \cite{phong1975}, is a simple yet effective method for approximating realistic shading. This model consists of three components: ambient shading, diffuse shading, and specular shading, as shown in Figure \ref{fig:phong_shading}.
+The Phong shading model, proposed by Phong Bui Tuong (1975) \cite{phong1975}, is a simple yet effective method for approximating realistic shading. This model consists of three components: ambient shading, diffuse shading, and specular shading, as shown in Figure \ref{fig:phong_shading}.
 
 \begin{minipage}{1\textwidth}
     \centering
@@ -277,16 +277,16 @@ Here, the ViewDir is a normalized vector pointing towards the camera, and the Re
 \subsection{Physically Based Rendering (PBR)}
 Earlier mentioned Phong Shading model, does not provide a highly realistic approximation of lighting. To achieve a realistic representation of ocean shading, it is necessary to incorporate a multitude of custom parameters.
 
-Physically Based Rendering (PBR) attempts to address this issue. However, it is important to note that "PBR is more of a conceptual framework than a set of rigid rules" \cite{wilson2017}. The PBR rendering model adheres to three primary principles: energy conservation, microfacet support, and the Fresnel effect.
+Physically Based Rendering (PBR) attempts to address this issue. However, it is important to note that "PBR is more of a conceptual framework than a set of rigid rules" [NAME????] \cite{wilson2017}. The PBR rendering model adheres to three primary principles: energy conservation, microfacet support, and the Fresnel effect.
 
-For the specific application of PBR in ocean shading, one can refer to “Wakes Explosions and Lighting: Interactive Water Simulation in Atlas” by Mark Mihelich and Tim Tcheblokov \cite{mark2021}, which provides an in-depth discussion on the subject. For a more general understanding of PBR, “Physically Based Shading in Theory and Practice” by Stephen Hill and Stephen McAuley \cite{stephan2012} offers comprehensive coverage of the topic from 2012 to 2020.
+For the specific application of PBR in ocean shading, one can refer to “Wakes Explosions and Lighting: Interactive Water Simulation in Atlas” by Mark Mihelich and Tim Tcheblokov (2021) \cite{mark2021}, which provides an in-depth discussion on the subject. For a more general understanding of PBR, “Physically Based Shading in Theory and Practice” by Stephen Hill and Stephen McAuley \cite{stephan2012} offers comprehensive coverage of the topic from 2012 to 2020.
 
 \subsection{Particle Simulation and Machine Learning}
 Particle-based methodologies, known for their ability to simulate water in a realistic and visually compelling manner, are frequently employed in the field of computer graphics. However, these methods come with a high computational cost, which can be a limiting factor.
 
-Recent advancements in Graphics Processing Unit (GPU) technology have started to alleviate this issue. Research, such as that conducted by Libo Huang \cite{huang2021}, is making particle simulations increasingly viable for ocean simulation. However, these techniques still demand a high-performance GPU and are not yet suitable for widespread real-time applications.
+Recent advancements in Graphics Processing Unit (GPU) technology have started to alleviate this issue. Research, such as that conducted by Libo Huang et al. (2021) \cite{huang2021}, is making particle simulations increasingly viable for ocean simulation. However, these techniques still demand a high-performance GPU and are not yet suitable for widespread real-time applications.
 
-In addition to these developments, there have been significant strides in the application of machine learning to accelerate fluid simulations. This is evident in the work of Dmitrii Kochkov \cite{kochkov2021machine}. Despite these advancements, real-time performance on lower-end GPUs remains a challenge.
+In addition to these developments, there have been significant strides in the application of machine learning to accelerate fluid simulations. This is evident in the work of Dmitrii Kochkov et al. (2021) \cite{kochkov2021machine}. Despite these advancements, real-time performance on lower-end GPUs remains a challenge.
 
 
 

@@ -22,7 +22,6 @@
 
 The ocean generation algorithm utilizes the Fast Fourier Transform (FFT) and is designed for the Unity engine. It uses the High-Level Shader Language (HLSL) for GPU computations. The algorithm processes textures of size $N$x$N$, with N being a power of 2, to satisfy the Inverse Fast Fourier Transform (IFFT) data sample requirement. For this project, we use a texture size of 512x512, balancing computational performance and visual realism. The algorithm comprises four main stages, as shown in Figure \ref{fig:ocean_algorithm}.
 
-The algorithm can be split into 4 main parts as shown in figure \ref{fig:ocean_algorithm}
 \begin{enumerate}
     \item \textbf{Gaussian Noise Generation:} The first stage involves the generation of Gaussian noise with a mean of 0 and a standard deviation of 1. Two values are generated, one for the real part and the other for the complex part, as shown in Equation \ref{eq:fouier_amplitudes}.
     \item \textbf{Spectrum Generation:} The second stage involves the generation of the initial spectrum, $\tilde{h}_0(\mathbf{k})$, which is used to generate all subsequent results. The real and imaginary parts of the spectrum are stored as the red and green channels of a texture, respectively. Additionally, a separate texture is used to store the wave vector, $\mathbf{k}$, and the dispersion relation, $\omega$.
@@ -41,7 +40,7 @@ The algorithm can be split into 4 main parts as shown in figure \ref{fig:ocean_a
 
 \subsection{Butterfly Texture}
 
-Our focus is primarily on the Inverse Fast Fourier Transform (IFFT) algorithm, and we will not be utilizing the FFT. To execute the IFFT, we generate a butterfly texture, as proposed by Fl{\"u}gge Fynn-Jorin \cite{flugge2017}. This texture, which is precomputed and stored in the GPU memory, has a width of $\log_2(n)$ and a height of n. It is a four-channel texture $(W_r,W_i,y_t,y_b)$, where $W_r$ and $W_i$ are the real and imaginary parts of the twiddle factor, and $y_t$ and $y_b$ are the top and bottom butterfly indices, respectively (as shown in Figure \ref{fig:butterfly_diagram}).
+Our focus is primarily on the Inverse Fast Fourier Transform (IFFT) algorithm, and we will not be utilizing the FFT. To execute the IFFT, we generate a butterfly texture, as proposed by Fl{\"u}gge Fynn-Jorin (2017) \cite{flugge2017}. This texture, which is precomputed and stored in the GPU memory, has a width of $\log_2(n)$ and a height of n. It is a four-channel texture $(W_r,W_i,y_t,y_b)$, where $W_r$ and $W_i$ are the real and imaginary parts of the twiddle factor, and $y_t$ and $y_b$ are the top and bottom butterfly indices, respectively (as shown in Figure \ref{fig:butterfly_diagram}).
 
 In butterfly texture coordinate x represents a stage \ref{fig:8_butterfly_diagram}, while each y represents a butterfly operation between two data points $y_t$ and $y_b$.
 
@@ -76,7 +75,7 @@ Finally, we calculate the twiddle factors as follows:
 
 \subsection{Performing IFFT}
 Our data is currently stored in a 2D texture. However, the IFFT algorithm is designed for 1D data. As a result, we need to perform a 1D IFFT on each row (horizontally) and then on each column (vertically), as shown in Figure \ref{fig:ifft_algorithm}.
-By following pseudocode from \cite{flugge2017} we can perform IFFT in 2D:
+By following pseudocode proposed by Fl{\"u}gge Fynn-Jorin (2017) \cite{flugge2017} we can perform IFFT in 2D:
 
 \begin{lstlisting}[caption={Horizontal Butterfly Operation}, frame=single, numberstyle=\small\color{gray}, captionpos=b]
     butterflyData = ButterflyTexture[Stage, id.x];
@@ -156,7 +155,7 @@ This causes our data to flip sign in grid like pattern therefore we need to perm
 \end{minipage}
 \vspace{0cm}
 
-The choice of spectrum is pivotal to the visual fidelity of an ocean simulation. The Tessendorf spectrum, initially implemented due to its straightforward application, did not yield satisfactory results. The wave energy transfer was unconvincing, the waves did not appear to adhere to the wave direction, and artistic control over the ocean's appearance was challenging. To ensure the realism of the simulated ocean, the TMA spectrum \ref{eq:tma_spectrum_k}, grounded in empirical data, was subsequently implemented:
+The choice of spectrum is pivotal to the visual fidelity of an ocean simulation. The Tessendorf's spectrum, initially implemented due to its straightforward application, did not yield satisfactory results. The wave energy transfer was unconvincing, the waves did not appear to adhere to the wave direction, and artistic control over the ocean's appearance was challenging. To ensure the realism of the simulated ocean, the TMA spectrum \ref{eq:tma_spectrum_k}, grounded in empirical data, was subsequently implemented:
 $$
     S_{\text{TMA}}(\mathbf{k}) = 2S_{\text{TMA}}(\omega, h) \cdot \frac{d\omega}{dk} / k \cdot \Delta k_x \cdot \Delta k_y
 $$
@@ -192,7 +191,7 @@ By having combined amplitudes \ref{eq:combined_amplitudes} we can perform IFFT a
 \end{minipage}
 
 The generation of a normal map is an essential step in ocean simulation as it provides critical information for calculating ocean shading. A normal map represents the perpendicular direction to the ocean surface at each point.
-The computation of a normal map necessitates the calculation of the gradient, which is the derivative of the height map. As per Tessendorf \cite{tessendorf2004}, the derivative is given by:
+The computation of a normal map necessitates the calculation of the gradient, which is the derivative of the height map. As per Tessendorf (2001) \cite{tessendorf2001}, the derivative is given by:
 \begin{equation}
     \epsilon(\textbf{x}, t) = i\textbf{k} \tilde{h}(\textbf{k}, t)
 \end{equation}
@@ -214,7 +213,7 @@ Then we need to perform IFFT \ref{fig:ifft_algorithm} to get normal map \ref{fig
 \vspace{0.3cm}
 
 The current rendering of the ocean (Figure \ref{fig:ocean_no_choppy}) appears excessively smooth and lacks the characteristic choppiness of real-world ocean waves. To address this, we introduce horizontal displacement into our model. This not only enhances the choppiness of the waves but also improves the realism of energy transfer between waves (Figure \ref{fig:ocean_choppy}).
-The calculation of horizontal displacement follows the formula proposed by Tessendorf \cite{tessendorf2004}:
+The calculation of horizontal displacement follows the formula proposed by Tessendorf (2001) \cite{tessendorf2001}:
 \begin{equation}
     \mathbf{D}_{\text{hori}}(\textbf{x}, t) = -i\frac{\mathbf{k}}{k}\tilde{h(\mathbf{k}, t)}
 \end{equation}
@@ -254,7 +253,7 @@ Once again we need to perform IFFT \ref{fig:ifft_algorithm} to get horizontal di
 
 \subsubsection{Output}
 
-The lighting model employed in our simulation, as shown in Equation \ref{eq:light_model}, is a combination of four fundamental components: ambient light, subsurface scattering, specular light, and environmental reflection. This model is the outcome of integrating the Phong model with concepts derived from the Game Developers Conference “Wakes, Explosions and Lighting: Interactive Water Simulation in Atlas” by Mark Mihelich and Tim Tcheblokov \cite{mark2021}. The resultant visual output of this composite lighting model can be observed in Figure \ref{fig:output_light}.
+The lighting model employed in our simulation, as shown in Equation \ref{eq:light_model}, is a combination of four fundamental components: ambient light, subsurface scattering, specular light, and environmental reflection. This model is the outcome of integrating the Phong model with concepts derived from the Game Developers Conference “Wakes, Explosions and Lighting: Interactive Water Simulation in Atlas” by Mark Mihelich and Tim Tcheblokov (2021) \cite{mark2021}. The resultant visual output of this composite lighting model can be observed in Figure \ref{fig:output_light}.
 \begin{equation}
     L = L_a + L_{ss} + L_s + L_r
     \label{eq:light_model}
@@ -267,7 +266,7 @@ The lighting model employed in our simulation, as shown in Equation \ref{eq:ligh
 \end{minipage}
 
 \subsubsection{Ambient Light}
-Ambient light, a constant illumination that does not depend on the direction of the light source, is the result of light scattering in the environment. For oceanic simulations, we utilize an approximation formula for ambient light derived from the GDC conference \cite{mark2021}: 
+Ambient light, a constant illumination that does not depend on the direction of the light source, is the result of light scattering in the environment. For oceanic simulations, we utilize an approximation formula for ambient light derived from the GDC conference by Mark Mihelich and Tim Tcheblokov (2021) \cite{mark2021}: 
 \begin{equation}
     L_a = k_a N C_a C_l + \rho_a C_b C_l
 \end{equation}
@@ -279,7 +278,7 @@ Ambient light, a constant illumination that does not depend on the direction of 
 \end{minipage}
 
 \subsubsection{Fresnel Effect}
-The Fresnel effect, a phenomenon where light is more reflective at grazing angles as shown in figure \ref{fig:fresnel_effect}, is crucial for calculations involving specular and reflection:
+The Fresnel effect [TALK ABOUT FRESNEL], a phenomenon where light is more reflective at grazing angles as shown in figure \ref{fig:fresnel_effect}, is crucial for calculations involving specular and reflection:
 \begin{equation}
     F = (1 - \max(D_v \cdot N, 0.15))^{5}
 \end{equation}
@@ -292,7 +291,7 @@ The Fresnel effect, a phenomenon where light is more reflective at grazing angle
 
 \subsubsection{Subsurface Scattering}
 
-Subsurface scattering describes the interaction of light when it penetrates an object, in this case, water. While ray tracing would typically be required for realistic results, we can use an approximation from the GDC conference \cite{mark2021} due to the majority of our light being trapped in the ocean, with only light at wave peaks able to escape. 
+Subsurface scattering describes the interaction of light when it penetrates an object, in this case, water. While ray tracing would typically be required for realistic results, we can use an approximation from the GDC conference [WHAT DO I DO HERE???] \cite{mark2021} due to the majority of our light being trapped in the ocean, with only light at wave peaks able to escape. 
 \begin{equation}
     \begin{split}
         L_{ss} &= (1-F) (L_{ss_1} + L_{ss_2}) C_{ws} C_l\\
@@ -354,7 +353,7 @@ In our project, we only consider the reflection of the skybox on the water surfa
 
 Ocean foam is a salient and realistic feature of the ocean, contributing to its distinct and authentic appearance. The primary occurrence of foam is observed during wave crashes, a phenomenon facilitated by horizontal displacement. This can be visually discerned at the peaks of waves where the water curls up, as illustrated in Figure \ref{fig:wave_curl}. In essence, our horizontal transformation undergoes an inversion.
 
-As proposed by Tessendorf \cite{tessendorf2001}, the rendering of foam can be achieved by calculating the determinant of the Jacobian matrix for horizontal displacement, which helps identify these inversions. In our ocean simulation, the Jacobian matrix provides insights into the changes over the x and z axes. When determinant of the Jacobian matrix is bellow zero the "wave crash" happens:
+As proposed by Tessendorf (2001) \cite{tessendorf2001}, the rendering of foam can be achieved by calculating the determinant of the Jacobian matrix for horizontal displacement, which helps identify these inversions. In our ocean simulation, the Jacobian matrix provides insights into the changes over the x and z axes. When determinant of the Jacobian matrix is bellow zero the "wave crash" happens:
 
 \begin{equation}
     \text{Det}(\mathbf{x}) = J_{xx} + J_{yy} - J_{xy} J_{yx}
@@ -409,9 +408,10 @@ Another approuch is to simulate multiple cascades for diffrent wave lengths $k$ 
 \begin{minipage}{1\textwidth}
     \centering
     \includegraphics[width=0.8\textwidth]{"images/cascades.png"}
-    \captionof{figure}{Cascades}
+    \captionof{figure}{Cascades [EXPLAIN MORE???]}
     \label{fig:cascades}
 \end{minipage}
+
 When it comes to chosing $l$ we need to follow these steps:
 \begin{enumerate}
     \item We chose bigger $l$ for bigger waves as we are more likly to notice tilling with big waves

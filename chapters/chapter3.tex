@@ -33,7 +33,7 @@ However, as the texture size increases, the performance on the M1 GPU deteriorat
 On the other hand, the Nvidia GeForce RTX 4070 GPU maintained a relatively consistent performance even with increased texture sizes, taking 3.29ms for a 512x512 texture and 10.70ms for a 1024x1024 texture.
 
 Interestingly, the use of cascades in our technique mitigates this issue to an extent. Cascades allow us to maintain a relatively consistent level of detail in the ocean’s visual representation, even when the texture size is increased. This feature makes our technique a viable option for game development across a wide range of computer systems, despite the performance variations observed with different GPUs and texture sizes. Thus, our FFT-based ocean generation technique exhibits a balance between visual fidelity and computational efficiency, making it a promising approach for real-time ocean rendering.
-
+[HERE I CONFIRM THAT I ACHIVED PERFORMANCE WISE]
 
 \section{Comparison} 
 
@@ -114,6 +114,7 @@ where each $l$ is the wave length scale of each cascade.
 
 When it comes to stormy ocean where huge waves is expected the general shape of an ocean is still relistic
 and can hadle the big waves without any trouble, and because of diffrent cascades the tilling is bearlly noticible as shown in the following figures \ref{fig:real_stormy_ocean} and \ref{fig:fake_stormy_ocean}.
+[HERE I BASICALLY SAY IT'S RELISTICx]
 
 \begin{minipage}[t]{0.48\textwidth}
     \centering
@@ -155,8 +156,9 @@ and can hadle the big waves without any trouble, and because of diffrent cascade
 \section{Limitations}
 During the implementation of our FFT-based ocean generation technique, we encountered challenges related to the global application of FFT-generated maps. This global application restricts us from selectively altering specific sections of the sea, such as the wake created by a moving ship or the reduced wave height near a shallow beach.
 
-To address these challenges, J. Tessendorf proposed a hybrid approach in his paper \cite{tessendorf2004}. This approach combines grid-based ocean generation, where each vertex point is propagated individually and FFT waves serve as ambient waves. Tessendorf later enhanced this approach with the release of “eWaves” \cite{tessendorf2014}.
+To address these challenges, J. Tessendorf proposed a hybrid approach in his paper "iWaves" (2004) (2004) \cite{tessendorf2004}. This approach combines grid-based ocean generation, where each vertex point is propagated individually and FFT waves serve as ambient waves. Tessendorf later enhanced this approach with the release of “eWaves” \cite{tessendorf2014}.
 
 These challenges underscore the complexities involved in ocean wave simulation and the potential of hybrid approaches in advancing the field. The proposed hybrid approach effectively addresses the identified challenges, demonstrating its potential in enhancing the realism and interactivity of ocean wave simulations.
 
 
+[DO I NEED CONCLUTION????]

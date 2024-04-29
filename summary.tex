@@ -1,36 +1,8 @@
 %<Concise statement of the problem you intended to solve and main achievements (no more than one A4 page)>\\
+\justifying
 
-Other Solutions:
-\begin{itemize}
-    \item Sum of sines
-    \item Gerstner waves
-    \item Particle based ocean simulation
-\end{itemize}
+This research is centered on the development and implementation of a real-time ocean simulation model. The model addresses several significant challenges in the field, including the elimination of tiling artifacts, adaptability to a range of weather conditions from calm to stormy, and efficient rendering capabilities across both low and high-end devices.
 
-Problems:
-\begin{itemize}
-    \item Computaiontally expensive to calculate huge amouts of sins.
-    \item Gerstner waves are not physically accurate.
-    \item Both are not easily modifiable.
-    \item Does not look good with stormy weather.
-    \item Tiling is noticable.
-    \item Lacks water detail.
-\end{itemize}
+The cornerstone of this research is the introduction of a Fourier Transform-based ocean model. This model is unique in its use of empirical data, which allows it to accurately simulate various weather conditions. Additionally, the model employs multiple cascades to effectively eliminate the common issue of tiling, enhancing the visual continuity of the simulated ocean surface.
 
-Problems I intend to solve:
-\begin{itemize}
-    \item Simulate water based on emipirical data for a more realistic look.
-    \item Have an easy modifiable ocean system.
-    \item Have an ocean that can simulate stormy weather.
-    \item Reduce tiling.
-    \item Have a more detailed ocean.
-\end{itemize}
-
-Main achivements:
-\begin{itemize}
-    \item Calculate on GPU.
-    \item Implement JONSWAP spectrum.
-    \item Implement FFT algorithm.
-    \item Simulate foam.
-    \item Shade the ocean.
-\end{itemize}
+To ensure broad device compatibility and efficient performance, the entire solution has been implemented on a GPU. This includes the integration of a Fast Fourier Transform algorithm, which enables the model to function efficiently across a wide range of devices.
