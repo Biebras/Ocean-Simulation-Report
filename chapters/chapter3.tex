@@ -5,7 +5,7 @@
 %<Results, evaluation (including user evaluation) {\em etc.} should be described in one or more chapters. See the `Results and Discussion' criterion in the mark scheme for the sorts of material that may be included here.>
 \section{Performance}
 
-The table below presents the performance metrics of our FFT-based ocean generation technique on two different GPUs: M1 and Nvidia GeForce RTX 4070. The metrics were recorded for three different texture sizes: 256x256, 512x512, and 1024x1024.
+The table below \ref{tab:fft_performance} presents the performance metrics of our FFT-based ocean generation technique on two different GPUs: M1 and Nvidia GeForce RTX 4070. The metrics were recorded for three different texture sizes: 256x256, 512x512, and 1024x1024.
 
 \begin{table}[h]
     \centering
@@ -32,8 +32,7 @@ However, as the texture size increases, the performance on the M1 GPU deteriorat
 
 On the other hand, the Nvidia GeForce RTX 4070 GPU maintained a relatively consistent performance even with increased texture sizes, taking 3.29ms for a 512x512 texture and 10.70ms for a 1024x1024 texture.
 
-Interestingly, the use of cascades in our technique mitigates this issue to an extent. Cascades allow us to maintain a relatively consistent level of detail in the ocean’s visual representation, even when the texture size is increased. This feature makes our technique a viable option for game development across a wide range of computer systems, despite the performance variations observed with different GPUs and texture sizes. Thus, our FFT-based ocean generation technique exhibits a balance between visual fidelity and computational efficiency, making it a promising approach for real-time ocean rendering.
-[HERE I CONFIRM THAT I ACHIVED PERFORMANCE WISE]
+Interestingly, the use of cascades in our technique mitigates this issue to an extent. Cascades allow us to maintain a relatively consistent level of detail in the ocean’s visual representation, even when the texture size is increased. This feature makes our technique a viable option for game development across a wide range of computer systems, despite the performance variations observed with different GPUs and texture sizes. Thus, our FFT-based ocean generation technique exhibits a balance between visual fidelity and computational efficiency, making it a promising approach for real-time ocean rendering on low and high end GPUs.
 
 \section{Comparison} 
 
@@ -74,9 +73,9 @@ The computational complexity of the DFT and FFT presents a significant contrast.
 \end{table}
 
 \subsection{Sum of Sins and FFT Based Ocean}
-A comparative analysis of the visual aspects of the Sum of Sins and FFT-based approaches reveals distinct differences. The Sum of Sins approach, while capable of generating waveforms, exhibits a lack of detail that results in less realistic wave movements and energy transfers as shown in figure \ref{fig:naive_calm}. This underperformance becomes dramatically apparent in stormy conditions \ref{fig:naive_stormy}, where the complexity and intensity of wave interactions are not adequately captured. However, the visual fidelity can be enhanced by integrating a pre-generated detailed water normal map, which can add complexity and depth to the visual representation.
+A comparative analysis of the visual aspects of the Sum of Sins and FFT-based approaches reveals distinct differences. The Sum of Sins approach, while capable of generating waveforms, exhibits a lack of detail that results in less realistic wave movements and energy transfers as shown in figure \ref{fig:naive_calm}. This under performance becomes dramatically apparent in stormy conditions \ref{fig:naive_stormy}, where the complexity and intensity of wave interactions are not adequately captured. However, the visual fidelity can be enhanced by integrating a pre-generated detailed water normal map, which can add complexity and depth to the visual representation.
 
-In contrast, the FFT-based approach inherently produces more realistic results. It automatically generates highly detailed normal maps, produces chopier waves, and accurately simulates energy transfers, contributing to a more authentic representation of oceanic conditions.
+In contrast, the FFT-based approach inherently produces more realistic results. It automatically generates highly detailed normal maps, produces choppier waves, and accurately simulates energy transfers, contributing to a more authentic representation of oceanic conditions.
 
 \begin{minipage}{0.48\textwidth}
     \centering
@@ -93,7 +92,7 @@ In contrast, the FFT-based approach inherently produces more realistic results. 
 \end{minipage}
 
 \subsection{Real world oceans}
-When it comes to calm ocean, the FFT based ocean with TMA spectrum performs extremelly well and holds the desired shape as shown in figures \ref{fig:real_calm_ocean} and \ref{fig:fake_calm_ocean}.
+When it comes to calm ocean, the FFT based ocean with TMA spectrum performs extremely well and holds the desired shape as shown in figures \ref{fig:real_calm_ocean} and \ref{fig:fake_calm_ocean}.
 
 \begin{minipage}[t]{0.48\textwidth}
     \centering
@@ -112,9 +111,8 @@ When it comes to calm ocean, the FFT based ocean with TMA spectrum performs extr
 
 where each $l$ is the wave length scale of each cascade.
 
-When it comes to stormy ocean where huge waves is expected the general shape of an ocean is still relistic
-and can hadle the big waves without any trouble, and because of diffrent cascades the tilling is bearlly noticible as shown in the following figures \ref{fig:real_stormy_ocean} and \ref{fig:fake_stormy_ocean}.
-[HERE I BASICALLY SAY IT'S RELISTICx]
+When it comes to stormy ocean where huge waves is expected the general shape of an ocean is still realistic
+and can handle the big waves without any trouble, and because of different cascades the tilling is berley noticeable as shown in the following figures \ref{fig:real_stormy_ocean} and \ref{fig:fake_stormy_ocean}.
 
 \begin{minipage}[t]{0.48\textwidth}
     \centering
@@ -131,7 +129,8 @@ and can hadle the big waves without any trouble, and because of diffrent cascade
     \label{fig:fake_stormy_ocean}
 \end{minipage}
 
-\section{Diffrent Outputs}
+\subsubsection{Diffrent Outputs}
+Following figures \ref{fig:output_1}, \ref{fig:output_2} and \ref{fig:output_3} are oceans with different parameters.
 
 \begin{minipage}[t]{1\textwidth}
     \centering
@@ -156,9 +155,6 @@ and can hadle the big waves without any trouble, and because of diffrent cascade
 \section{Limitations}
 During the implementation of our FFT-based ocean generation technique, we encountered challenges related to the global application of FFT-generated maps. This global application restricts us from selectively altering specific sections of the sea, such as the wake created by a moving ship or the reduced wave height near a shallow beach.
 
-To address these challenges, J. Tessendorf proposed a hybrid approach in his paper "iWaves" (2004) (2004) \cite{tessendorf2004}. This approach combines grid-based ocean generation, where each vertex point is propagated individually and FFT waves serve as ambient waves. Tessendorf later enhanced this approach with the release of “eWaves” \cite{tessendorf2014}.
+To address these challenges, J. Tessendorf proposed a hybrid approach in his paper "iWaves" (2004) \cite{tessendorf2004}. This approach combines grid-based ocean generation, where each vertex point is propagated individually and FFT waves serve as ambient waves. Tessendorf later enhanced this approach with the release of “eWaves” \cite{tessendorf2014}.
 
 These challenges underscore the complexities involved in ocean wave simulation and the potential of hybrid approaches in advancing the field. The proposed hybrid approach effectively addresses the identified challenges, demonstrating its potential in enhancing the realism and interactivity of ocean wave simulations.
-
-
-[DO I NEED CONCLUTION????]

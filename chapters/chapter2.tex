@@ -25,7 +25,7 @@ The ocean generation algorithm utilizes the Fast Fourier Transform (FFT) and is 
 \begin{enumerate}
     \item \textbf{Gaussian Noise Generation:} The first stage involves the generation of Gaussian noise with a mean of 0 and a standard deviation of 1. Two values are generated, one for the real part and the other for the complex part, as shown in Equation \ref{eq:fouier_amplitudes}.
     \item \textbf{Spectrum Generation:} The second stage involves the generation of the initial spectrum, $\tilde{h}_0(\mathbf{k})$, which is used to generate all subsequent results. The real and imaginary parts of the spectrum are stored as the red and green channels of a texture, respectively. Additionally, a separate texture is used to store the wave vector, $\mathbf{k}$, and the dispersion relation, $\omega$.
-    \item \textbf{Frequency Generation:} In the third stage, the initial spectrum is used to generate a frequency height map for vertical vertex displacement, a frequency normal map for shading, and a frequency horizontal displacement map for horizontal vertex displacement. Furthermore, six values are calculated for the Jacobian, which is used to generate foam. Due to the limitation of a maximum of four values per texture, two textures are used to store the Jacobian values.
+    \item \textbf{Frequency Generation:} In the third stage, the initial spectrum is used to generate a frequency height map for vertical vertex displacement, a frequency normal map for shading, and a frequency horizontal displacement map for horizontal vertex displacement. Furthermore, six values are calculated for the Jacobian, which is used to generate foam. Due to the limitation of a maximum of four values per pixel, two textures are used to store the Jacobian values.
     \item \textbf{Inverse FFT (IFFT) Conversion:} The final stage involves the use of the Inverse Fast Fourier Transform (IFFT) algorithm to convert the maps from the frequency domain to the time domain.
 \end{enumerate}
 
@@ -74,8 +74,8 @@ Finally, we calculate the twiddle factors as follows:
 \end{equation}
 
 \subsection{Performing IFFT}
-Our data is currently stored in a 2D texture. However, the IFFT algorithm is designed for 1D data. As a result, we need to perform a 1D IFFT on each row (horizontally) and then on each column (vertically), as shown in Figure \ref{fig:ifft_algorithm}.
-By following pseudocode proposed by Fl{\"u}gge Fynn-Jorin (2017) \cite{flugge2017} we can perform IFFT in 2D:
+Our data is currently stored in a 2D texture. However, the IFFT algorithm is designed for 1D data. As a result, we need to perform a 1D IFFT on each row (horizontally \ref{}) and then on each column (vertically), as shown in Figure \ref{fig:ifft_algorithm}.
+By following pseudo code proposed by Fl{\"u}gge Fynn-Jorin (2017) \cite{flugge2017} we can perform IFFT in 2D:
 
 \begin{lstlisting}[caption={Horizontal Butterfly Operation}, frame=single, numberstyle=\small\color{gray}, captionpos=b]
     butterflyData = ButterflyTexture[Stage, id.x];
@@ -102,7 +102,7 @@ After we perform IFFT on each row, we need to perform for each column:
 \end{lstlisting}
 
 \subsection*{Permutation}
-Lastlly, our data needs to be permuted as you will see later our data is offseted:
+Lastly, our data needs to be permuted as you will see later our data is offset:
 \begin{equation}
     [\text{freq} (-N / 2), \text{ ...}, \text{ freq} (-1), \text{ freq} (0), \text{ freq} (1), \text{ ...}, \text{ freq} (N / 2 - 1)]
 \end{equation}
@@ -132,18 +132,20 @@ This causes our data to flip sign in grid like pattern therefore we need to perm
         $S(\omega, \theta)$ & Directional wave spectrum\\
         $S(\mathbf{k})$ & Directional wave spectrum\\
         $\mathbf{k}$ & wave vector \\
-        $k$ & Magnetude of wave vector\\
+        $k$ & Magnitude of wave vector\\
         $l$ & Length scale of the ocean\\
-        $\omega$ & dispertion relationship (angular frequency)\\
+        $\omega$ & dispersion relationship (angular frequency)\\
         $U_{10}$ & Wind speed at 10m above the sea level\\
-        $F$ & Fetch (Disntance from lee shore)\\
+        $F$ & Fetch (Distance from lee shore)\\
         $\theta_{\text{wind}}$ & Wind angle\\
         $\lambda$ & Wave Choppy factor\\
         \bottomrule
     \end{tabular}
-    \caption{Deffinition Table}
+    \caption{Symbols for ocean geometry}
     \label{table:deffinition_table}
 \end{table}
+
+We will utilize symbols inside table \ref{table:deffinition_table} to describe formulas needed for ocean geometry.
 
 \subsection{Spectrum Generation}
 
@@ -180,15 +182,9 @@ The symmetry of the Fourier series allows us to mirror the amplitudes, eliminati
 \end{equation}
 where $T_{h_0}(x, y)$ is fourier amplitude in precomputed texture at $x^{*} = (n - x) \text{ mod } n$, $y^{*} = (n - y) \text{ mod } n$, $(x, y)$ is current position in the texture.
 
-By having combined amplitudes \ref{eq:combined_amplitudes} we can perform IFFT as shown in \ref{fig:ifft_algorithm} to produce height map as shown in figure \ref{fig:tma_height_map}.
+By having combined amplitudes \ref{eq:combined_amplitudes} we can perform IFFT as shown in \ref{fig:ifft_algorithm} to produce height map as shown in figure \ref{fig:tma_height_map}.\\
 
 \subsection{Normal Map Generation}
-\begin{minipage}{1\textwidth}
-    \centering
-    \includegraphics[width=0.40\textwidth]{"images/tma_normal.png"}
-    \captionof{figure}{Normal Map using $S_{\text{TMA}}$}
-    \label{fig:tma_normal_map}
-\end{minipage}
 
 The generation of a normal map is an essential step in ocean simulation as it provides critical information for calculating ocean shading. A normal map represents the perpendicular direction to the ocean surface at each point.
 The computation of a normal map necessitates the calculation of the gradient, which is the derivative of the height map. As per Tessendorf (2001) \cite{tessendorf2001}, the derivative is given by:
@@ -196,6 +192,13 @@ The computation of a normal map necessitates the calculation of the gradient, wh
     \epsilon(\textbf{x}, t) = i\textbf{k} \tilde{h}(\textbf{k}, t)
 \end{equation}
 Then we need to perform IFFT \ref{fig:ifft_algorithm} to get normal map \ref{fig:tma_normal_map} in the time domain.
+
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.40\textwidth]{"images/tma_normal.png"}
+    \captionof{figure}{Normal Map using $S_{\text{TMA}}$}
+    \label{fig:tma_normal_map}
+\end{minipage}
 
 \subsection{Choppy Waves}
 \begin{minipage}{0.49\textwidth}
@@ -235,7 +238,7 @@ Once again we need to perform IFFT \ref{fig:ifft_algorithm} to get horizontal di
         $L_a$ & Ambient Light & $C_{s}$ & Specular Color \\
         $L_{ss}$ & Subsurface Scatter Light & $C_{ws}$ & Water Scattering Color \\
         $L_s$ & Specular Light & $C_{\text{sky}}$ & Sky Color \\
-        $L_r$ & Enviroment Reflection & $H$ & Ocean Height \\
+        $L_r$ & Environment Reflection & $H$ & Ocean Height \\
         $N$ & Normal & $F$ & Fresnel Effect \\
         $D_s$ & Sun Direction & $\rho_a$ & Air Bubble Density \\
         $D_v$ & View Direction & $k_a$ & Ambient Light Intensity \\
@@ -245,9 +248,11 @@ Once again we need to perform IFFT \ref{fig:ifft_algorithm} to get horizontal di
         $C_b$ & Air Bubble Color & & \\
         \bottomrule
     \end{tabular}
-    \caption{Lighting Parameters}
+    \caption{Symbols for shading}
     \label{table:lighting_parameters}
 \end{table}
+
+We will utilize symbols inside table \ref{table:lighting_parameters} to describe formulas needed for ocean shading.
 
 \subsection{Lighting Model}
 
@@ -260,13 +265,13 @@ The lighting model employed in our simulation, as shown in Equation \ref{eq:ligh
 \end{equation}
 \begin{minipage}{1\textwidth}
     \centering
-    \includegraphics[width=0.50\textwidth]{"images/output_light.png"}
-    \captionof{figure}{Finall Shader Output}
+    \includegraphics[width=0.40\textwidth]{"images/output_light.png"}
+    \captionof{figure}{Final Shader Output}
     \label{fig:output_light}
 \end{minipage}
 
 \subsubsection{Ambient Light}
-Ambient light, a constant illumination that does not depend on the direction of the light source, is the result of light scattering in the environment. For oceanic simulations, we utilize an approximation formula for ambient light derived from the GDC conference by Mark Mihelich and Tim Tcheblokov (2021) \cite{mark2021}: 
+Ambient light \ref{fig:ambient_light}, a constant illumination that does not depend on the direction of the light source, is the result of light scattering in the environment. For oceanic simulations, we utilize an approximation formula for ambient light derived from the GDC conference by Mark Mihelich and Tim Tcheblokov (2021) \cite{mark2021}: 
 \begin{equation}
     L_a = k_a N C_a C_l + \rho_a C_b C_l
 \end{equation}
@@ -278,7 +283,7 @@ Ambient light, a constant illumination that does not depend on the direction of 
 \end{minipage}
 
 \subsubsection{Fresnel Effect}
-The Fresnel effect [TALK ABOUT FRESNEL], a phenomenon where light is more reflective at grazing angles as shown in figure \ref{fig:fresnel_effect}, is crucial for calculations involving specular and reflection:
+The Fresnel effect, a phenomenon where light is more reflective at grazing angles as shown in figure \ref{fig:fresnel_effect}, is crucial for calculations involving specular and reflection:
 \begin{equation}
     F = (1 - \max(D_v \cdot N, 0.15))^{5}
 \end{equation}
@@ -291,7 +296,7 @@ The Fresnel effect [TALK ABOUT FRESNEL], a phenomenon where light is more reflec
 
 \subsubsection{Subsurface Scattering}
 
-Subsurface scattering describes the interaction of light when it penetrates an object, in this case, water. While ray tracing would typically be required for realistic results, we can use an approximation from the GDC conference [WHAT DO I DO HERE???] \cite{mark2021} due to the majority of our light being trapped in the ocean, with only light at wave peaks able to escape. 
+Subsurface scattering describes the interaction of light when it penetrates an object, in this case, water. While ray tracing would typically be required for realistic results, we can use an approximation from the GDC conference \cite{mark2021} due to the majority of our light being trapped in the ocean, with only light at wave peaks able to escape. This can be observed in the following figures \ref{fig:lss1_light}, \ref{fig:lss2_light} and \ref{fig:lss_light}
 \begin{equation}
     \begin{split}
         L_{ss} &= (1-F) (L_{ss_1} + L_{ss_2}) C_{ws} C_l\\
@@ -366,7 +371,7 @@ where,
         1 + \lambda\frac{\partial D_y(\mathbf{x})}{\partial x} & 1 + \lambda\frac{\partial D_y(\mathbf{x})}{\partial y} 
     \end{bmatrix} 
 \end{equation}
-in this case $J_{xy} = J_{yx}$. After appling IFFT, the results can be observed in figure \ref{fig:foam_texture}.
+in this case $J_{xy} = J_{yx}$. After applying IFFT, the results can be observed in figure \ref{fig:foam_texture}.
 
 \begin{minipage}{1\textwidth}
     \centering
@@ -376,24 +381,25 @@ in this case $J_{xy} = J_{yx}$. After appling IFFT, the results can be observed 
 \end{minipage}
 
 \subsubsection{Foam Accumilation}
-Curretlly the foam apears and diasapears quicly, however in real life the foam accumilates and disapears over time.
-We can introduce foam accumilation by compering previous and current foam values:
+
+\begin{minipage}{1\textwidth}
+    \centering
+    \includegraphics[width=0.75\textwidth]{"images/ocean_with_foam.png"}
+    \captionof{figure}{Ocean With Foam}
+    \label{fig:ocean_with_foam}
+\end{minipage}
+
+Currently the foam appears and disappears quickly, however in real life the foam accumulates and disappears over time.
+We can introduce foam accumulation by compering previous and current foam values:
 \begin{lstlisting}[caption={Foam Accumilation}, frame=single, numberstyle=\small\color{gray}, captionpos=b]
     accumulation = 
     LastFoamValue - FoamDecay * DeltaTime / max(currentFoam, 0.5);
     foam = max(accumulation, currentFoam);
 \end{lstlisting}
-This results in pleasing foam accumilation (Figure \ref{fig:ocean_with_foam}):
-
-\begin{minipage}{1\textwidth}
-    \centering
-    \includegraphics[width=0.8\textwidth]{"images/ocean_with_foam.png"}
-    \captionof{figure}{Ocean With Foam}
-    \label{fig:ocean_with_foam}
-\end{minipage}
+This results in pleasing foam accumulation (Figure \ref{fig:ocean_with_foam}):
 
 \section{Multiple Cascades}
-At this stage our ocean with texture 512x512 simulates 262,144 distinc waves however the tilling is still noticible \ref{fig:ocean_with_tilling}.
+At this stage our ocean with texture 512x512 simulates 262,144 distinct waves however the tilling is still noticeable \ref{fig:ocean_with_tilling}.
 
 \begin{minipage}{1\textwidth}
     \centering
@@ -403,19 +409,19 @@ At this stage our ocean with texture 512x512 simulates 262,144 distinc waves how
 \end{minipage}
 
 To counter this we could increase our simulation texture however even FFT becomes expensive really fast.
-Another approuch is to simulate multiple cascades for diffrent wave lengths $k$ \ref{fig:cascades} and diffrent $l$ length scales. We can split our simulation into 3 parts, big waves, medium waves and small waves.
+Another approach is to simulate multiple cascades for different wave lengths $k$ \ref{fig:cascades} and different $l$ length scales. We can split our simulation into 3 parts, big waves, medium waves and small waves.
 
 \begin{minipage}{1\textwidth}
     \centering
     \includegraphics[width=0.8\textwidth]{"images/cascades.png"}
-    \captionof{figure}{Cascades [EXPLAIN MORE???]}
+    \captionof{figure}{3 cascades}
     \label{fig:cascades}
 \end{minipage}
 
-When it comes to chosing $l$ we need to follow these steps:
+When it comes to choosing $l$ we need to follow these steps:
 \begin{enumerate}
-    \item We chose bigger $l$ for bigger waves as we are more likly to notice tilling with big waves
-    \item We chose smaller $l$ for smaller waves as we are less likly to notice tilling with small waves
+    \item We chose bigger $l$ for bigger waves as we are more likely to notice tilling with big waves
+    \item We chose smaller $l$ for smaller waves as we are less likely to notice tilling with small waves
 \end{enumerate}
 This results ocean that has less tilling and more detail \ref{fig:ocean_with_cascades}.
 
@@ -445,14 +451,17 @@ The second category, modern APIs, includes Metal, Vulkan, and DirectX. These API
 
 The final category is game engines, specifically Unity and Unreal. These engines are excellent for computer graphics as they offer a wealth of functionality, most importantly, useful UI tools that make development easier. However, they are massive tools with many custom needs, and you need experience to use them correctly.
 
-All these options are viable as they all have the capability to fulfill our project requirements. However, after careful consideration, we chose Unity. his choice was primarily driven by our greater familiarity with Unity compared to other tools. Furthermore, Unity offers a comprehensive suite of tools, encompassing UI design, GPU programming, and an integrated build system. These features significantly streamline the development process, rendering Unity as the optimal choice for our project's needs.
+All these options are viable as they all have the capability to fulfill our project requirements. However, after careful consideration, we chose Unity. This choice was primarily driven by our greater familiarity with Unity compared to other tools. Furthermore, Unity offers a comprehensive suite of tools, encompassing UI design, GPU programming, and an integrated build system. These features significantly streamline the development process, rendering Unity as the optimal choice for our project's needs.
 
 \section{Utilization of Unity Tools}
-In our project, we strategically employed Unity’s toolset. We used C\# for startup computations, setting the initial conditions and parameters for our project including communication between CPU and GPU.
+In our project, we strategically employed Unity’s tool set. We used C\# for startup computations, setting the initial conditions and parameters for our project including communication between CPU and GPU.
 
 For the intensive mathematical computations inside compute shaders and vertex and fragment shaders, we utilized the High-Level Shading Language (HLSL) for GPU programming. This approach allowed us to leverage the computational power of the GPU, enhancing the performance and visual fidelity of our project.
 
 Additionally, Unity’s built-in User Interface (UI) system and build system were used for creating interactive UIs and streamlining the compilation process, respectively. These tools collectively contributed to the effective and efficient development of our project.
 
-\section{Version Controll}
+\section{Version Control}
 In the development of our project, we adopted GitHub as our version control system. This platform facilitated the systematic management of different versions of our project files. By organizing our project into branches, we were able to work on individual features without affecting the main codebase. This approach not only enhanced the efficiency of our development process but also ensured the integrity and stability of our project.
+
+\section{Testing}
+The outputs from each GPU kernel were rendered as UI images. This facilitated a direct visual comparison of our results with the graphical data presented in established research papers such as Tessendorf (2001) \cite{tessendorf2001} and Fl{\"u}gge Fynn-Jorin (2017) \cite{flugge2017}.
